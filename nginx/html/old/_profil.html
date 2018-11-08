@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta name="theme-color" content="#455a64">
+	<meta name="description" content="Automatic snack ordering on Kroky.si">
+	<meta name="author" content="Tjan Ljubešek">
+	<link rel="shortcut icon" type="image/ico" href="favicon.ico"/>
+	<title>Auto Malica</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="css/stylesheet.css" rel="stylesheet">
+</head>
+
+<body>
+	<nav class="blue-grey darken-2">
+		<a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+		<i class="material-icons white-text brand-logo center hide-on-med-and-up show-on-medium">restaurant</i>
+		<div class="nav-wrapper">
+		  <ul class="right">
+			<li><div id="username" class="grey darken-4 white-text chip center dropdown-logout" style="min-width: 80px;" data-activates='dropdown1'>Username</div></li>
+			<ul id='dropdown1' class='dropdown-content'>
+				<li><a href="#!" class="grey-text text-darken-4"><i class="material-icons">exit_to_app</i>Odjava</a></li>
+			</ul>
+		  </ul>
+		</div>
+	</nav>
+
+	<ul id="slide-out" class="side-nav fixed blue-grey darken-2 z-depth-0">
+	  <li class="logo"><a class="white-text" href="/malica"><h5>Auto malica</h5></a></li>
+	  <li><div class="divider transparent"></div></li>
+	  <li><a class="white-text" href="/malica"><i class="material-icons white-text">restaurant</i>Pregled</a></li>
+	  <li class="no-padding">
+		<li><a class="dropdown-button white-text" href="#!" data-activates="dropdown-settings"><i class="material-icons white-text">settings</i>Nastavitve<i class="material-icons right white-text">arrow_drop_down</i></a></li>
+		<ul id='dropdown-settings' class='dropdown-content'>
+			<li><a href="naročanje.html"><i class="material-icons">tune</i>Naročanje</a></li>
+			<li><a href=""><i class="material-icons">account_circle</i>Profil</a></li>
+		</ul>
+	</ul>
+		
+	<main class="grey-text text-darken-4">
+		<div class="row">
+			<div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
+				<h3>Profil</h3>
+				<div class="row">
+					<div class="col s5">
+						<span>Privzeti meni</span>
+					</div>
+					<div class="col s7">
+						<select name="privzeti" style="overflow-y: auto;">
+							<option value="" disabled selected>Izberi meni</option>
+							<option value="1" >Meni 1 - Osnovni topli</option>
+							<option value="2" >Meni 2 - Vitalni topli</option>
+							<option value="3" >Meni 3 - Vegi topli</option>
+							<option value="4" >Meni 4 - Fast topli</option>
+							<option value="5" >Meni 5 - Solatni</option>
+							<option value="6" >Meni 6 - Osnovni hladni</option>
+							<option value="7" >Meni 7 - Vitalni hladni</option>
+							<option value="8" >Meni 8 - Vegi hladni</option>
+							<option value="9" >Meni 9 - Sweet hladni</option>
+							<option value="10" >Meni 10 - Brez S</option>
+							<option value="11" >Meni 11 - Dieta topli</option>
+							<option value="12" >Meni 12 - Dieta hladni</option>
+							<option value="13" >Meni 13 - Žlica meni</option>
+							<option value="14" >Meni 14 - Tradicionalni menu</option> 
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col s5">
+						<span>Pošlji na E-mail</span>
+					</div>
+					<div class="col s7">
+						<div class="switch right">
+						<label>
+							<input type="checkbox">
+							<span class="lever"></span>
+						</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
+				<a id="shrani" class="waves-effect waves-light btn blue-grey lighten-1 right">Shrani</a>
+			</div>
+		</div>
+		
+	</main>
+   
+	<footer class="page-footer grey lighten-3" style="padding-top: 0;">
+		<div class="footer-copyright">
+			<div class="container">
+				<div class="center">© 2018</div>
+			</div>
+		  </div>
+	</footer>
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script src="js/profile.js"></script>
+
+</html>
