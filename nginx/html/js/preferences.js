@@ -69,7 +69,7 @@ $.get("/api/getPreferences.php", function(data){
 	} else {
 		addLevel();
 	}
-	if (data["blacklist"] != "") {
+	if (data["blacklist"] != null) {
 		addBlacklist(data["blacklist"]);
 	} else {
 		addBlacklist()
@@ -103,7 +103,7 @@ $("#shrani, #shrani1").click(function() {
 		var chipData = $(this).children(".chips").material_chip('data');
 		if (chipData.length != 0) {
 			for (var i = 0; i < chipData.length; i++) {
-				tmp.push(chipData[i]["tag"].replace("|",""));
+				tmp.push(chipData[i]["tag"]);
 			}
 			levels.push(tmp);
 		} else {
@@ -119,7 +119,7 @@ $("#shrani, #shrani1").click(function() {
 	var chipData = $("#blacklistLevel").children(".chips").material_chip('data');
 	if (chipData.length != 0) {
 		for (var i = 0; i < chipData.length; i++) {
-			blacklist.push(chipData[i]["tag"].replace("|",""));
+			blacklist.push(chipData[i]["tag"]);
 		}
 	}
 

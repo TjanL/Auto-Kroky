@@ -1,11 +1,11 @@
 # Tjan Ljubesek #
 # April 2018    #
-import kroky_lib2, MySQLdb, argparse
+import kroky_lib2, MySQLdb, argparse, json
 from random import choice
 
 print("###############\n# Auto malica #\n###############")
 
-db = MySQLdb.connect("localhost","root","tjan1122000","autoMalica",charset='utf8')
+db = MySQLdb.connect("localhost","","","autoMalica",charset='utf8')
 
 cursor = db.cursor()
 
@@ -17,7 +17,7 @@ args = parser.parse_args()
 
 usr_id = args.userID
 
-stmt = "SELECT xxl,email,k_username,k_password,blacklist,`1`,`2`,`3`,`4`,`5` FROM config where id=%s"
+stmt = "SELECT xxl,email,k_username,k_password,blacklist,conf_index FROM config where id=%s"
 cursor.execute(stmt, (usr_id))
 user = cursor.fetchone()
 
@@ -26,10 +26,12 @@ email = user[1]
 username = user[2]
 password = user[3]
 
-blacklist = user[4].split("|")
-blacklist = list(filter(lambda x: x != "", blacklist))
-index = [user[i].split("|") for i in range(5,len(user))]
-index = list(filter(lambda x: x[0] != "", index))
+blacklist = json.loads(user[4])
+if blacklist is None:
+	blacklist = []
+index = json.loads(user[5])
+if index is None:
+	blacklist = []
 index.reverse()
 
 
@@ -51,7 +53,7 @@ print("-------------------|",k.firstWeekDate,"-",k.lastWeekDate,"|--------------
 
 teden = ["pon", "tor", "sre", "cet", "pet"]
 meniji = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-log = ["","","","",""]
+log = {"pon":"", "tor":"", "sre":"", "cet":"", "pet":""}
 
 for dan in range(len(teden)):
 
@@ -101,14 +103,14 @@ for dan in range(len(teden)):
 
 	if choiceList[-1][0] == -1:						# If last item is "False"
 		print(teden[dan].capitalize(),":","Canceled")
-		log[dan] = "Canceled"
+		log[teden[dan]] = "Canceled"
 
 	elif choiceList[0][0] == 0:						# If the first item (best item) has grade 0
 		if xxl and k.checkXXL(dan, k.defaultMenu):
 			k.selectXXL(dan, k.defaultMenu)
 
 		print(teden[dan].capitalize(),":","{} (Default menu)".format(k.checkItem(dan, k.defaultMenu)))
-		log[dan] = "{} (Default menu)".format(k.checkItem(dan, k.defaultMenu))
+		log[teden[dan]] = "{} (Default menu)".format(k.checkItem(dan, k.defaultMenu))
 
 	else:											# Randomly choose between best items
 		itemChoice = choice(choiceList)
@@ -119,7 +121,7 @@ for dan in range(len(teden)):
 			k.selectItem(dan, itemChoice[2])
 
 		print(teden[dan].capitalize(),":",itemChoice[1])
-		log[dan] = itemChoice[1]
+		log[teden[dan]] = itemChoice[1]
 
 
 	tmp = k.firstWeekDate.split(".")
@@ -127,8 +129,9 @@ for dan in range(len(teden)):
 	tmp = k.lastWeekDate.split(".")
 	weekEnd = tmp[2]+"-"+tmp[1]+"-"+tmp[0]
 
-stmt = "INSERT INTO log (id, weekStart, weekEnd, mon, tue, wed, thr, fri) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE weekStart=%s, weekEnd=%s, mon=%s, tue=%s, wed=%s, thr=%s, fri=%s"
-cursor.execute(stmt, (usr_id, weekStart, weekEnd, log[0], log[1], log[2], log[3], log[4], weekStart, weekEnd, log[0], log[1], log[2], log[3], log[4]))
+log = json.dumps(log, ensure_ascii=False).encode('utf8')
+stmt = "INSERT INTO log (id, weekStart, weekEnd, order_log) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE weekStart=%s, weekEnd=%s, order_log=%s"
+cursor.execute(stmt, (usr_id, weekStart, weekEnd, log, weekStart, weekEnd, log))
 db.commit()
 
 if email:

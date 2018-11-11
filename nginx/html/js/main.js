@@ -5,11 +5,11 @@ $.get(url, function(data){
 		$('#tableHead').html(data["weekStart"]+" - "+data["weekEnd"]);
 		$('#update').html("Posodobljeno ob "+data["updated"]);
 
-		$('#pon').html(data["log"][0]);
-		$('#tor').html(data["log"][1]);
-		$('#sre').html(data["log"][2]);
-		$('#cet').html(data["log"][3]);
-		$('#pet').html(data["log"][4]);	
+		$('#pon').html(data["log"]["pon"]);
+		$('#tor').html(data["log"]["tor"]);
+		$('#sre').html(data["log"]["sre"]);
+		$('#cet').html(data["log"]["cet"]);
+		$('#pet').html(data["log"]["pet"]);	
 	} else {
 		$('#tableHead').html("Ni naročila");
 	}

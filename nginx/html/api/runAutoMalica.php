@@ -28,7 +28,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
 				if ((time()-$timeLimit) > strtotime($updated_at)) {
 					putenv('LANG=en_US.UTF-8');
 
-					exec("/usr/local/bin/python3 /home/pi/AutoMalica/auto_malica_v5.0_web_single.py " . $id);
+					exec("/usr/local/bin/python3 /path/to/file/auto_malica_v5.0_web_single.py " . $id);
 				} else {
 					echo $timeLimit - (time() - strtotime($updated_at));
 				} 

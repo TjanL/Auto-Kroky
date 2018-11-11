@@ -3,7 +3,7 @@ $.get("/api/getProfile.php", function(data){
 	if (!jQuery.isEmptyObject(data)) {	
 		$('select').material_select();
 		$("#k_username").val(data["k_username"]);
-		$("#k_password").val("_________");
+		$("#k_password").val("         ");
 
 		$("#email").prop('checked', data["email"]);
 		$("#xxl").prop('checked', data["xxl"]);
@@ -30,7 +30,7 @@ $("#shrani").click(function() {
 	var xxl = +$("#xxl").prop('checked');
 	var email = +$("#email").prop('checked');
 	var user = $("#k_username").val();
-	var pass = ($("#k_password").val() == "_________") ? "" : $("#k_password").val();
+	var pass = ($("#k_password").val() == "         ") ? "" : $("#k_password").val();
 
 	$.post("/api/updateProfile.php", {"xxl": xxl, "email": email, "user": user,"pass": pass})
 		.done(function(data) {
