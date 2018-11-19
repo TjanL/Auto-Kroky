@@ -36,7 +36,7 @@ for user in results:
 		# Initialize
 		k = kroky_lib2.kroky(username, password,verbose=True)
 	except Exception as e:
-		print("Username or password incorrect!")
+		print(e)
 		continue
 	
 	
