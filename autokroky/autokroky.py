@@ -7,13 +7,37 @@ import datetime
 import argparse
 
 
-class AutoKroky(object):
-	def __init__(self):
+class Order(object):
+
+	class Item(object):
+		def __init__(self, user, dan, meni, index, blacklist):
+			self.ime = user.get_snack(dan, meni)
+			self.meni = meni
+			self.ocena = self._get_grade(index, blacklist)
+
+		def _get_grade(self, index, blacklist):
+			if self.ime != False: # If "False", day is canceled
+				tmp = 0
+				for block in blacklist:
+					if block.lower() in self.ime.lower(): # Check if string contains any blacklisted words
+						return tmp
+
+				grade = 0
+				for y in index:
+					grade += 1
+					for x in y:
+						if x.lower() in self.ime.lower():
+							tmp = grade
+							break
+				return tmp
+			return -1
+
+	def __init__(self, single_user_id=None):
 		parser = argparse.ArgumentParser()
 		parser.add_argument("--user", type=int, nargs=1, help='ID of the user to order for')
 
 		args = parser.parse_args()
-		user_id = args.user[0] if args.user else None
+		user_id = args.user[0] if args.user else single_user_id
 
 		print("###############\n# Auto malica #\n###############")
 
@@ -29,8 +53,7 @@ class AutoKroky(object):
 		results = db.get_config(user_id)
 
 		for user in results:
-			if user_id is None:
-				user_id = user["id"]
+			user_id = user["id"] if user_id is None:
 
 			blacklist = json.loads(user["blacklist"])
 			if blacklist is None:
@@ -106,28 +129,6 @@ class AutoKroky(object):
 
 		db.close()
 
-	class Item(object):
-		def __init__(self, user, dan, meni, index, blacklist):
-			self.ime = user.get_snack(dan, meni)
-			self.meni = meni
-			self.ocena = self._get_grade(index, blacklist)
-
-		def _get_grade(self, index, blacklist):
-			if self.ime != False: # If "False", day is canceled
-				tmp = 0
-				for block in blacklist:
-					if block.lower() in self.ime.lower(): # Check if string contains any blacklisted words
-						return tmp
-
-				grade = 0
-				for y in index:
-					grade += 1
-					for x in y:
-						if x.lower() in self.ime.lower():
-							tmp = grade
-							break
-				return tmp
-			return -1
 
 if __name__ == '__main__':
-	AutoKroky()
+	Order()
