@@ -1,5 +1,5 @@
 from kroky_lib2 import User
-from database import Connect
+from database.database import Connect
 from random import choice
 import datetime
 import json
@@ -53,7 +53,8 @@ class Order(object):
 		results = db.get_config(user_id)
 
 		for user in results:
-			user_id = user["id"] if user_id is None:
+			if user_id is None:
+				user_id = user["id"]
 
 			blacklist = json.loads(user["blacklist"])
 			if blacklist is None:
