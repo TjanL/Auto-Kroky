@@ -9,10 +9,11 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 }
 
 require_once realpath("/usr/local/nginx/sql_config.php");
+header("Content-type: text/json; charset=utf-8");
 
 $id = $_SESSION["id"];
 
-$sql = "SELECT DATE_FORMAT(weekStart,'%d.%m.%Y'),DATE_FORMAT(weekEnd,'%d.%m.%Y'),DATE_FORMAT(updated_at,'%T %d.%m.%Y'),mon,tue,wed,thr,fri FROM log WHERE id = ?";
+$sql = "SELECT DATE_FORMAT(week_start,'%d.%m.%Y'),DATE_FORMAT(week_end,'%d.%m.%Y'),DATE_FORMAT(updated_at,'%T %d.%m.%Y'),order_log FROM log WHERE id = ?";
 
 if($stmt = mysqli_prepare($link, $sql)) {
 	mysqli_stmt_bind_param($stmt, "i", $id);
@@ -20,16 +21,15 @@ if($stmt = mysqli_prepare($link, $sql)) {
 	if(mysqli_stmt_execute($stmt)) {
 		mysqli_stmt_store_result($stmt);
 		if(mysqli_stmt_num_rows($stmt) > 0){
-			$result = array();
-			mysqli_stmt_bind_result($stmt, $weekStart, $weekEnd, $updated, $result[0], $result[1], $result[2], $result[3], $result[4]);
+			mysqli_stmt_bind_result($stmt, $weekStart, $weekEnd, $updated, $log);
 			
 			if(mysqli_stmt_fetch($stmt)){
 				$obj = new stdClass();
 				$obj->weekStart = $weekStart;
 				$obj->weekEnd = $weekEnd;
 				$obj->updated = $updated;
-				$obj->log = $result;
-				echo json_encode($obj);
+				$obj->log = json_decode($log);
+				echo json_encode($obj, JSON_UNESCAPED_UNICODE);
 			}
 		} else {
 			echo "{}";

@@ -9,10 +9,11 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 }
 
 require_once realpath("/usr/local/nginx/sql_config.php");
+header("Content-type: text/json; charset=utf-8");
 
 $id = $_SESSION["id"];
 
-$sql = "SELECT `1`,`2`,`3`,`4`,`5`,blacklist FROM config WHERE id = ?";
+$sql = "SELECT conf_index, blacklist FROM config WHERE id = ?";
 
 if($stmt = mysqli_prepare($link, $sql)) {
 	mysqli_stmt_bind_param($stmt, "i", $id);
@@ -21,19 +22,13 @@ if($stmt = mysqli_prepare($link, $sql)) {
 		mysqli_stmt_store_result($stmt);
 		if(mysqli_stmt_num_rows($stmt) > 0){
 			// Bind result variables
-			$result = array();
-			mysqli_stmt_bind_result($stmt, $result[0], $result[1], $result[2], $result[3], $result[4], $result[5]);
+			mysqli_stmt_bind_result($stmt, $index, $blacklist);
 		
 			if(mysqli_stmt_fetch($stmt)){
-				for ($i=0; $i < count($result)-1; $i++) {
-					if ($result[$i] != "") {
-						$tmp[] = explode("|", $result[$i]);
-					}
-				}
 				$obj = new stdClass();
-				$obj->index = $tmp;
-				$obj->blacklist = explode("|", $result[5]);
-				echo json_encode($obj);
+				$obj->index = json_decode($index);
+				$obj->blacklist = json_decode($blacklist);
+				echo json_encode($obj, JSON_UNESCAPED_UNICODE);
 			}
 
 		} else {

@@ -3,7 +3,7 @@
 require_once realpath("/usr/local/nginx/sql_config.php");
  
 // Define variables and initialize with empty values
-$username = $password = $confirm_password = "";
+$username = $password = $confirm_password = $k_username = $k_password = "";
 $username_err = $password_err = $confirm_password_err = $k_err = "";
  
 // Processing form data when form is submitted
@@ -152,26 +152,43 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			
 			// Attempt to execute the prepared statement
 			if(mysqli_stmt_execute($stmt)){
-				$sql = "INSERT INTO config (k_username,k_password) VALUES (?, ?)";
-		 
-				if($stmt1 = mysqli_prepare($link, $sql)){
-					// Bind variables to the prepared statement as parameters
-					mysqli_stmt_bind_param($stmt1, "ss", $param_k_username, $param_k_password);
-					
-					// Set parameters
-					$param_k_username = trim($_POST["k_username"]);
-					$param_k_password = trim($_POST["k_password"]);
-					
+				$sql = "SELECT id FROM users WHERE username = ?";
+
+				if($stmt2 = mysqli_prepare($link, $sql)) {
+					mysqli_stmt_bind_param($stmt2, "s", $username);
 					// Attempt to execute the prepared statement
-					if(mysqli_stmt_execute($stmt1)){
-						// Redirect to login page
-						header("location: login.php");
-					} else {
-						echo "Something went wrong. Please try again later.";
+					if(mysqli_stmt_execute($stmt2)) {
+						mysqli_stmt_store_result($stmt2);
+						
+						// Bind result variables
+						mysqli_stmt_bind_result($stmt2, $id);
+					
+						if(mysqli_stmt_fetch($stmt2)) {
+							$sql = "INSERT INTO config (id, k_username, k_password) VALUES (?, ?, ?)";
+
+							if($stmt1 = mysqli_prepare($link, $sql)){
+								// Bind variables to the prepared statement as parameters
+								mysqli_stmt_bind_param($stmt1, "iss", $param_id, $param_k_username, $param_k_password);
+								
+								// Set parameters
+								$param_id = $id;
+								$param_k_username = trim($_POST["k_username"]);
+								$param_k_password = trim($_POST["k_password"]);
+								
+								// Attempt to execute the prepared statement
+								if(mysqli_stmt_execute($stmt1)){
+									// Redirect to login page
+									header("location: login.php");
+								} else {
+									echo "Something went wrong. Please try again later.";
+								}
+							}
+							// Close statement
+							mysqli_stmt_close($stmt1);
+						}
 					}
+					mysqli_stmt_close($stmt2);
 				}
-				// Close statement
-				mysqli_stmt_close($stmt1);
 			} else {
 				echo "Something went wrong. Please try again later.";
 			}

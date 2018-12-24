@@ -9,6 +9,7 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 }
 
 require_once realpath("/usr/local/nginx/sql_config.php");
+header("Content-type: text/json; charset=utf-8");
 
 $id = $_SESSION["id"];
 
@@ -29,7 +30,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
 				$obj->email = $email;
 				$obj->k_username = $k_user;
 
-				echo json_encode($obj);
+				echo json_encode($obj, JSON_UNESCAPED_UNICODE);
 			}
 
 		} else {

@@ -11,10 +11,14 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 require_once realpath("/usr/local/nginx/sql_config.php");
 
 $id = $_SESSION["id"];
-$xxl = $_POST["xxl"];
-$email = $_POST["email"];
+$xxl = intval($_POST["xxl"]);
+$email = intval($_POST["email"]);
 $k_user = $_POST["user"];
 $k_pass = $_POST["pass"];
+
+if(!is_integer($xxl) || !is_integer($email)) {
+	die("Oops! Something went wrong. Please try again later.");
+}
 
 if ($k_pass == "") {
 	$sql = "UPDATE config SET k_username=?, xxl=?, email=? WHERE id = ?";
@@ -24,7 +28,7 @@ if ($k_pass == "") {
 
 if($stmt = mysqli_prepare($link, $sql)){
 	if ($k_pass == "") {
-		mysqli_stmt_bind_param($stmt, "ssii", $k_user, $xxl, $email, $id);
+		mysqli_stmt_bind_param($stmt, "siii", $k_user, $xxl, $email, $id);
 	} else {
 		define('USER_AGENT', 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36');
 		define('LOGIN_FORM_URL', 'http://www.kroky.si/2016/?mod=register&action=login');

@@ -11,18 +11,18 @@ if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
 require_once realpath("/usr/local/nginx/sql_config.php");
 
 $id = $_SESSION["id"];
-$response = $_POST["levels"];
 
-for ($i=0; $i < count($response); $i++) { 
-	$response[$i] = join("|",$response[$i]);
+$response = json_encode($_POST["levels"], JSON_UNESCAPED_UNICODE);
+$blacklist = json_encode($_POST["blacklist"], JSON_UNESCAPED_UNICODE);
+
+if((!is_array($_POST["levels"]) && $_POST["levels"] != "") || (!is_array($_POST["blacklist"]) && $_POST["blacklist"] != "")) {
+	die("Oops! Something went wrong. Please try again later.");
 }
 
-$blacklist = join("|",$_POST["blacklist"]);
-
-$sql = "UPDATE config SET `1`=?, `2`=?, `3`=?, `4`=?, `5`=?, blacklist=? WHERE id = ?";
+$sql = "UPDATE config SET conf_index=?, blacklist=? WHERE id = ?";
 
 if($stmt = mysqli_prepare($link, $sql)){
-	mysqli_stmt_bind_param($stmt, "ssssssi", $response[0], $response[1], $response[2], $response[3], $response[4], $blacklist, $id);
+	mysqli_stmt_bind_param($stmt, "ssi", $response, $blacklist, $id);
 	// Attempt to execute the prepared statement
 	if(!mysqli_stmt_execute($stmt)) {
 		echo "Oops! Something went wrong. Please try again later.";
