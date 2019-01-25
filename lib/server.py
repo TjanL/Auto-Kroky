@@ -1,18 +1,16 @@
+from passlib.hash import pbkdf2_sha256
+import kroky_lib2
 import cherrypy
 import glob
 import os
-import MySQLdb
-from passlib.hash import pbkdf2_sha256
-import kroky_lib2
+import database
 
 
 class WebServer(object):
-	def __init__(self, root_dir):
-		self.root_dir = root_dir
-
+	def __init__(self):
 		# Preload html files
 		self.html_files = {}
-		for file in glob.glob("../html/*.html"):
+		for file in glob.glob(os.path.abspath("../html/*.html")):
 			self.html_files[os.path.basename(file)] = open(file, encoding="utf8").read()
 
 	@cherrypy.tools.register("before_handler")
@@ -44,32 +42,42 @@ class WebServer(object):
 		cherrypy.lib.sessions.expire()
 		raise cherrypy.HTTPRedirect("/login")
 
+	@cherrypy.expose
+	def test(self):
+		return open(os.path.abspath("../html/test.html"), encoding="utf8").read()
+
 	def error_page(status, message, traceback, version):
 		return open(os.path.abspath("../html/404.html"), encoding="utf8").read()
 
 
 class Api(object):
-	def __init__(self, db_user, db_password, database, db_ip="localhost"):
-		self._db = MySQLdb.connect(db_ip, db_user, db_password, database, charset='utf8')
-		self._cursor = db.cursor()
+	def __init__(self, db_file_path):
+		self._db = database.Connector(db_file_path)
 
 	def error_page(status, message, traceback, version):
 		return status
 
 	@cherrypy.tools.register("before_handler")
-	def require_auth(self):
+	def require_auth():
 		if not cherrypy.session.get("id"):
 			return {"error": "Not logged in!"}
 
+	@cherrypy.tools.register("before_handler")
+	def db_connect(self):
+		self._db.connect()
+
+	@cherrypy.tools.register("on_end_request")
+	def db_disconnect(self):
+		self._db.close()
+
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
+	@cherrypy.tools.db_connect()
+	@cherrypy.tools.db_disconnect()
 	@cherrypy.tools.allow(methods=["GET"])
 	def login(self, username, password):
 		if username and password:
-			stmt = "SELECT username, password, id FROM users WHERE username = %s"
-			self._cursor.execute(stmt, [username])
-			user, hash_pass, user_id = cursor.fetchone()
-
+			username, hash_pass, user_id = self._db.get_login(username)
 			if pbkdf2_sha256.verify(password, hash_pass):
 				cherrypy.session["username"] = username
 				cherrypy.session["id"] = user_id
@@ -79,12 +87,12 @@ class Api(object):
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
+	@cherrypy.tools.db_connect()
+	@cherrypy.tools.db_disconnect()
 	@cherrypy.tools.allow(methods=["GET"])
 	def register(self, username, password, c_password, k_username, k_password):
 		if username:
-			stmt = "SELECT id FROM users WHERE username = %s"
-			self._cursor.execute(stmt, [username])
-			if self._cursor.fetchone():
+			if self._db.check_user(username):
 				return {"error": "Username already taken!"}
 
 		elif password:
@@ -93,10 +101,7 @@ class Api(object):
 			elif c_password != password:
 				return {"error": "Passwords did not match"}
 
-		stmt = "SELECT id FROM config WHERE k_username = %s"
-		self._cursor.execute(stmt, [username])
-		user_id = self._cursor.fetchone():
-		if user_id:
+		if self._db.check_k_user(k_username):
 			return {"error": "This username is already in use"}
 
 		if not kroky_lib2.User(k_username, k_password):
@@ -105,54 +110,106 @@ class Api(object):
 		cherrypy.session["username"] = username
 		cherrypy.session["id"] = user_id
 
-		stmt = "INSERT INTO users (username, password) VALUES (%s, %s)"
-		self._cursor.execute(stmt, [username, pbkdf2_sha256.hash(password)])
-		self._db.commit()
-
-		stmt = "INSERT INTO config (k_username, k_password) VALUES (%s, %s)"
-		self._cursor.execute(stmt, [k_username, k_password])
-		self._db.commit()
+		self._db.add_user(username, pbkdf2_sha256.hash(password))
+		self._db.add_user_config(k_username, k_password)
 
 		raise cherrypy.HTTPRedirect("/")
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.allow(methods=["GET"])
+	@cherrypy.tools.db_connect()
+	@cherrypy.tools.db_disconnect()
 	@cherrypy.tools.require_auth()
+	@cherrypy.tools.allow(methods=["GET"])
 	def get_order(self):
-		stmt = "SELECT DATE_FORMAT(weekStart,'%d.%m.%Y'),DATE_FORMAT(weekEnd,'%d.%m.%Y'),DATE_FORMAT(updated_at,'%T %d.%m.%Y'),mon,tue,wed,thr,fri FROM log WHERE id = %s"
-		self._cursor.execute(stmt, [cherrypy.session.get("id")])
-		res = self._cursor.fetchone():
-
-		if res:
-			return {"weekStart": res[0], "weekEnd": res[1], "updated": res[2], "log": [res[3], res[4], res[5], res[6], res[7], res[8]]}
+		week_start, week_end, updated_at, order_log = self._db.get_log(cherrypy.session.get("id"))
+		if week_start and week_end and updated_at and order_log:
+			return {
+				"weekStart": week_start,
+				"weekEnd": weekEnd,
+				"updated": updated_at,
+				"log": order_log
+			}
 		return {}
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.allow(methods=["GET"])
+	@cherrypy.tools.db_connect()
+	@cherrypy.tools.db_disconnect()
 	@cherrypy.tools.require_auth()
+	@cherrypy.tools.allow(methods=["GET"])
 	def get_preferences(self):
-		stmt = "SELECT conf_index, blacklist FROM config WHERE id = %s"
-		self._cursor.execute(stmt, [cherrypy.session.get("id")])
-		res = self._cursor.fetchone():
-
-		if res:
-			return {"index": res[0], "blacklist": res[1]}
+		conf_index, blacklist = self._db.get_preferences(cherrypy.session.get("id"))
+		if conf_index and blacklist:
+			return {
+				"index": conf_index,
+				"blacklist": blacklist
+			}
 		return {}
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.allow(methods=["GET"])
+	@cherrypy.tools.db_connect()
+	@cherrypy.tools.db_disconnect()
 	@cherrypy.tools.require_auth()
-	def get_preferences(self):
-		stmt = "SELECT xxl, email, k_username FROM config WHERE id = %s"
-		self._cursor.execute(stmt, [cherrypy.session.get("id")])
-		res = self._cursor.fetchone():
-
-		if res:
-			return {"xxl": res[0], "email": res[1], "k_username": res[2]}
+	@cherrypy.tools.allow(methods=["GET"])
+	def get_profile(self):
+		xxl, email, k_username = self._db.get_profile(cherrypy.session.get("id"))
+		if xxl and email and k_username:
+			return {
+				"xxl": xxl,
+				"email": email,
+				"k_username": k_username
+			}
 		return {}
+
+	#@cherrypy.tools.db_connect()
+	#@cherrypy.tools.db_disconnect()
+	#@cherrypy.tools.require_auth()
+	@cherrypy.expose
+	@cherrypy.tools.json_in()
+	@cherrypy.tools.json_out()
+	@cherrypy.tools.allow(methods=["POST"])
+	def update_preferences(self):
+		input_json = cherrypy.request.json
+		self._db.set_preferences(cherrypy.session.get("id"),
+								 input_json["levels"],
+								 input_json["blacklist"]
+								)
+
+	@cherrypy.expose
+	@cherrypy.tools.json_in()
+	@cherrypy.tools.json_out()
+	@cherrypy.tools.allow(methods=["POST"])
+	def update_profile(self):
+		input_json = cherrypy.request.json
+		if input_json["pass"]:
+			if not kroky_lib2.User(input_json["user"], input_json["pass"]):
+				return {"error": "Username or password incorrect"}
+
+			self._db.set_profile(cherrypy.session.get("id"),
+								 input_json["email"],
+								 input_json["xxl"],
+								 input_json["user"],
+								 input_json["pass"]
+								)
+		else:
+			self._db.set_profile(cherrypy.session.get("id"),
+								 input_json["email"],
+								 input_json["xxl"],
+								 input_json["user"]
+								)
+
+	def run_auto_kroky(self):
+		input_json = cherrypy.request.json
+
+
+	@cherrypy.expose
+	@cherrypy.tools.json_in()
+	@cherrypy.tools.json_out()
+	@cherrypy.tools.allow(methods=["POST"])
+	def test(self):
+		print(cherrypy.request.json)
 
 
 if __name__ == '__main__':
@@ -167,11 +224,17 @@ if __name__ == '__main__':
 		}
 	}
 
-	api = Api("", "", "")
+	api_conf = {
+		'/': {
+			   'tools.sessions.on': True,
+			   'error_page.default': Api.error_page
+			}
+	}
+
+	api = Api("")
 	api.login = api.login
 
-	cherrypy.tree.mount(WebServer(""), '/', conf)
-	cherrypy.tree.mount(api, '/api', conf)
+	cherrypy.tree.mount(WebServer(), '/', conf)
+	cherrypy.tree.mount(api, '/api', api_conf)
 	cherrypy.server.socket_host = "127.0.0.1"
 	cherrypy.engine.start()
-
