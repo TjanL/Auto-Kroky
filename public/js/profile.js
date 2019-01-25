@@ -1,14 +1,18 @@
-$.get("/api/getProfile.php", function(data){
-	$(".progress").fadeOut(500);
-	if (!jQuery.isEmptyObject(data)) {	
-		$('select').material_select();
-		$("#k_username").val(data["k_username"]);
-		$("#k_password").val("         ");
+$.get({
+	url: "/api/get_profile",
+	success: function(data){
+		$(".progress").fadeOut(500);
+		if (!jQuery.isEmptyObject(data)) {	
+			$('select').material_select();
+			$("#k_username").val(data["k_username"]);
+			$("#k_password").val("         ");
 
-		$("#email").prop('checked', data["email"]);
-		$("#xxl").prop('checked', data["xxl"]);
-	}
-}, "json");
+			$("#email").prop('checked', data["email"]);
+			$("#xxl").prop('checked', data["xxl"]);
+		}
+	},
+	dataType: "json"
+});
 
 // Initialize collapse button
 $(".button-collapse").sideNav({
@@ -32,19 +36,23 @@ $("#shrani").click(function() {
 	var user = $("#k_username").val();
 	var pass = ($("#k_password").val() == "         ") ? "" : $("#k_password").val();
 
-	$.post("/api/updateProfile.php", {"xxl": xxl, "email": email, "user": user,"pass": pass})
-		.done(function(data) {
+	$.post({
+		url: "/api/update_profile",
+		data: JSON.stringify({"xxl": xxl, "email": email, "user": user,"pass": pass}),
+		success: function(data) {
 			if (data != "Login error") {
 				Materialize.toast('Shranjeno!', 4000) // 4000 is the duration of the toast
 			} else {
 				$("#k_username").addClass("invalid");
 				$("#k_password").addClass("invalid");
 			}
-		})
-		.fail(function() {
+		},
+		error: function() {
 			Materialize.toast('Napaka! Poskusite kasneje', 4000) // 4000 is the duration of the toast
-		});
-});
+		},
+		contentType: "application/json",
+		dataType: "json"
+	});
 
 $("#order").click(function() {
 	$(".progress").fadeIn(500);

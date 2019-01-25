@@ -60,21 +60,25 @@ function addBlacklist(tags = []) {
 	});
 }
 
-$.get("/api/getPreferences.php", function(data){
-	$(".progress").fadeOut(500);
-	if (data["index"] != null && data["index"].length > 0) {
-		for (var i = 0; i < data["index"].length; i++) {
-			addLevel(data["index"][i]);
+$.get({
+	url: "/api/get_preferences",
+	success: function(data) {
+		$(".progress").fadeOut(500);
+		if (data["index"] != null && data["index"].length > 0) {
+			for (var i = 0; i < data["index"].length; i++) {
+				addLevel(data["index"][i]);
+			}
+		} else {
+			addLevel();
 		}
-	} else {
-		addLevel();
-	}
-	if (data["blacklist"] != null) {
-		addBlacklist(data["blacklist"]);
-	} else {
-		addBlacklist()
-	}
-}, "json");
+		if (data["blacklist"] != null) {
+			addBlacklist(data["blacklist"]);
+		} else {
+			addBlacklist()
+		}
+	},
+	dataType: "json"
+});
 
 // Initialize collapse button
 $(".button-collapse").sideNav({
@@ -123,13 +127,17 @@ $("#shrani, #shrani1").click(function() {
 		}
 	}
 
-	$.post("/api/updatePreferences.php", {"levels": levels, "blacklist": blacklist})
-		.done(function() {
+	$.post({
+		url: "/api/update_references",
+		data: JOSN.stringify({"levels": levels, "blacklist": blacklist}),
+		success: function() {
 			$(".progress").fadeOut(500);
 			Materialize.toast('Shranjeno!', 4000) // 4000 is the duration of the toast
-		})
-		.fail(function() {
+		},
+		error: function() {
 			$(".progress").fadeOut(500);
 			Materialize.toast('Napaka! Poskusite kasneje', 4000) // 4000 is the duration of the toast
-		});
-});
+		},
+		contentType: "application/json",
+		dataType: "json"
+	});
