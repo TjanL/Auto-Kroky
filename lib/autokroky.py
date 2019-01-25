@@ -1,10 +1,9 @@
 from kroky_lib2 import User
-from database.database import Connect
+from database import Connector
 from random import choice
 import datetime
-import json
-import datetime
 import argparse
+import json
 
 
 class Order(object):
@@ -49,7 +48,7 @@ class Order(object):
 			settings = json.load(f)
 			f.close()
 
-		db = Connect(settings["database"]["user"], settings["database"]["password"], "autoMalica")
+		db = Connector(settings["database"]["user"], settings["database"]["password"], "autoMalica")
 		results = db.get_config(user_id)
 
 		for user in results:
@@ -75,7 +74,7 @@ class Order(object):
 			except Exception as e:
 				print(e)
 				continue
-			
+
 			monday = datetime.datetime.strptime(k.week, "%d.%m.%Y")
 			friday = monday.date() + datetime.timedelta(days=4)
 			print("-------------------|", monday.strftime("%d.%m.%Y"), "-", friday.strftime("%d.%m.%Y"), "|-------------------")
@@ -90,7 +89,7 @@ class Order(object):
 				# Remove the best choice from item list and append it to choice list
 				choice_list = []
 				choice_list.append(item.pop(0))
-			
+
 				# Check if any other item has a same grade as best item or the item is "Day Canceled" (-1)
 				for i in item:
 					if i.ocena == choice_list[0].ocena or i.ocena == -1:
@@ -101,14 +100,14 @@ class Order(object):
 				if choice_list[-1].ocena == -1:						# If last item is "False"
 					print(teden[dan].capitalize(), ":", "Canceled")
 					log[teden[dan]] = "Canceled"
-			
+
 				elif choice_list[0].ocena == 0:						# If the first item (best item) has grade 0
 					if user["xxl"] and k.get_snack_xxl(dan, k.default_menu):
 						k.set_snack_xxl(dan, k.default_menu)
 
 					print(teden[dan].capitalize(), ":", "{} (Default menu)".format(k.get_snack(dan, k.default_menu)))
 					log[teden[dan]] = "{} (Default menu)".format(k.get_snack(dan, k.default_menu))
-			
+
 				else:											# Randomly choose between best items
 					item_choice = choice(choice_list)
 
