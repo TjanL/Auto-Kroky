@@ -1,9 +1,17 @@
 import sqlite3
+import os
 
 
 class Connector(object):
 	def __init__(self, database):
 		self._db_name = database
+		if not os.path.isfile(os.path.abspath(database)):
+			self.connect()
+			self._create_users_table()
+			self._create_config_table()
+			self._create_log_table()
+			self._create_log_timestamp_triggers()
+			self.close
 
 	def connect(self):
 		self._conn = sqlite3.connect(self._db_name)
@@ -11,6 +19,54 @@ class Connector(object):
 
 	def close(self):
 		self._conn.close()
+
+	def _create_users_table(self):
+		stmt = """CREATE TABLE users (
+				  'id' integer PRIMARY KEY AUTOINCREMENT,
+				  'username' text NOT NULL,
+				  'password' text NOT NULL,
+				  'created_at' timestamp DEFAULT CURRENT_TIMESTAMP
+				);"""
+		self._cursor.execute(stmt)
+		self._conn.commit()
+
+	def _create_config_table(self):
+		stmt = """CREATE TABLE config (
+				  'id' integer primary key autoincrement,
+				  'xxl' integer NOT NULL DEFAULT '0',
+				  'email' integer NOT NULL DEFAULT '0',
+				  'k_username' text NOT NULL,
+				  'k_password' text NOT NULL,
+				  'blacklist' text NOT NULL,
+				  'conf_index' text NOT NULL
+				);"""
+		self._cursor.execute(stmt)
+		self._conn.commit()
+
+	def _create_log_table(self):
+		stmt = """CREATE TABLE log (
+				  'id' integer primary key autoincrement,
+				  'week_start' text NOT NULL,
+				  'week_end' text NOT NULL,
+				  'order_log' text NOT NULL,
+				  'updated_at' timestamp NOT NULL
+				);"""
+		self._cursor.execute(stmt)
+		self._conn.commit()
+
+	def _create_log_timestamp_triggers(self):
+		stmt = """CREATE TRIGGER update_timestamp_INSERT AFTER INSERT ON log
+					BEGIN
+						UPDATE log SET updated_at = datetime('now') WHERE id = new.id;
+					END;"""
+		self._cursor.execute(stmt)
+
+		stmt = """CREATE TRIGGER update_timestamp_UPDATE AFTER UPDATE ON log
+					BEGIN
+						UPDATE log SET updated_at = datetime('now') WHERE id = new.id;
+					END;"""
+		self._cursor.execute(stmt)
+		self._conn.commit()
 
 	def get_config(self, user_id=None):
 		if user_id:
@@ -31,9 +87,12 @@ class Connector(object):
 	def get_login(self, username):
 		stmt = "SELECT username, password, id FROM users WHERE username = %s"
 		self._cursor.execute(stmt, [username])
-		user, hash_pass, user_id = cursor.fetchone()
 
-		return user, hash_pass, user_id
+		row = self._cursor.fetchone()
+		if row:
+			user, hash_pass, user_id = row
+			return user, hash_pass, user_id
+		return None
 
 	def check_user(self, username):
 		stmt = "SELECT id FROM users WHERE username = %s"
@@ -58,22 +117,34 @@ class Connector(object):
 		self._conn.commit()
 
 	def get_log(self, user_id):
-		stmt = "SELECT DATE_FORMAT(week_start,'%d.%m.%Y'),DATE_FORMAT(week_end,'%d.%m.%Y'),DATE_FORMAT(updated_at,'%T %d.%m.%Y'),order_log FROM log WHERE id = ?"
+		stmt = "SELECT strftime('%d.%m.%Y',week_start),strftime('%d.%m.%Y',week_end),strftime('%T %d.%m.%Y', updated_at),order_log FROM log WHERE id = ?"
 		self._cursor.execute(stmt, [user_id])
-		week_start, week_end, updated_at, order_log = self._cursor.fetchone()
-		return week_start, week_end, updated_at, order_log
+
+		row = self._cursor.fetchone()
+		if row:
+			week_start, week_end, updated_at, order_log = row
+			return week_start, week_end, updated_at, order_log
+		return None
 
 	def get_preferences(self, user_id):
 		stmt = "SELECT conf_index, blacklist FROM config WHERE id = ?"
 		self._cursor.execute(stmt, [user_id])
-		conf_index, blacklist = self._cursor.fetchone()
-		return conf_index, blacklist
+
+		row = self._cursor.fetchone()
+		if row:
+			conf_index, blacklist = row
+			return conf_index, blacklist
+		return None
 
 	def get_profile(self, user_id):
 		stmt = "SELECT xxl, email, k_username FROM config WHERE id = ?"
 		self._cursor.execute(stmt, [user_id])
-		xxl, email, k_username = self._cursor.fetchone()
-		return xxl, email, k_username
+
+		row = self._cursor.fetchone()
+		if row:
+			xxl, email, k_username = row
+			return xxl, email, k_username
+		return None
 
 	def set_preferences(self, user_id, index, blacklist):
 		stmt = "UPDATE config SET conf_index=?, blacklist=? WHERE id = ?"
