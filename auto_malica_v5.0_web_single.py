@@ -125,13 +125,13 @@ for dan in range(len(teden)):
 
 
 	tmp = k.firstWeekDate.split(".")
-	weekStart = tmp[2]+"-"+tmp[1]+"-"+tmp[0]
+	week_start = tmp[2]+"-"+tmp[1]+"-"+tmp[0]
 	tmp = k.lastWeekDate.split(".")
-	weekEnd = tmp[2]+"-"+tmp[1]+"-"+tmp[0]
+	week_end = tmp[2]+"-"+tmp[1]+"-"+tmp[0]
 
 log = json.dumps(log, ensure_ascii=False).encode('utf8')
-stmt = "INSERT INTO log (id, weekStart, weekEnd, order_log) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE weekStart=%s, weekEnd=%s, order_log=%s"
-cursor.execute(stmt, (usr_id, weekStart, weekEnd, log, weekStart, weekEnd, log))
+stmt = "INSERT INTO log (id, week_start, week_end, order_log) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE week_start=%s, week_end=%s, order_log=%s"
+cursor.execute(stmt, (usr_id, week_start, week_end, log, week_start, week_end, log))
 db.commit()
 
 if email:

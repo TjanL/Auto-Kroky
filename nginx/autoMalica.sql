@@ -46,8 +46,8 @@ CREATE TABLE `config` (
 
 CREATE TABLE `log` (
   `id` int(11) NOT NULL,
-  `weekStart` date NOT NULL,
-  `weekEnd` date NOT NULL,
+  `week_start` date NOT NULL,
+  `week_end` date NOT NULL,
   `order_log` mediumtext COLLATE utf8_slovenian_ci NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_slovenian_ci;
