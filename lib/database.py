@@ -37,8 +37,8 @@ class Connector(object):
 				  'email' integer NOT NULL DEFAULT '0',
 				  'k_username' text NOT NULL,
 				  'k_password' text NOT NULL,
-				  'blacklist' text NOT NULL,
-				  'conf_index' text NOT NULL
+				  'blacklist' text DEFAULT '[]',
+				  'conf_index' text DEFAULT '[]'
 				);"""
 		self._cursor.execute(stmt)
 		self._conn.commit()
@@ -49,7 +49,7 @@ class Connector(object):
 				  'week_start' text NOT NULL,
 				  'week_end' text NOT NULL,
 				  'order_log' text NOT NULL,
-				  'updated_at' timestamp NOT NULL
+				  'updated_at' timestamp
 				);"""
 		self._cursor.execute(stmt)
 		self._conn.commit()
@@ -70,7 +70,7 @@ class Connector(object):
 
 	def get_config(self, user_id=None):
 		if user_id:
-			stmt = "SELECT xxl,email,k_username,k_password,blacklist,conf_index FROM config WHERE id=%s"
+			stmt = "SELECT xxl,email,k_username,k_password,blacklist,conf_index FROM config WHERE id=?"
 			self._cursor.execute(stmt, [user_id])
 		else:
 			stmt = "SELECT id, xxl, email, k_username, k_password, blacklist, conf_index FROM config"
@@ -80,12 +80,12 @@ class Connector(object):
 		return [dict(zip(columns, row)) for row in self._cursor.fetchall()]
 
 	def set_log(self, user_id, week_start, week_end, order_log):
-		stmt = "INSERT INTO log (id, week_start, week_end, order_log) VALUES (%s,%s,%s,%s) ON DUPLICATE KEY UPDATE week_start=%s, week_end=%s, order_log=%s"
-		self._cursor.execute(stmt, (user_id, week_start, week_end, order_log, week_start, week_end, order_log))
+		stmt = "REPLACE INTO log (id, week_start, week_end, order_log) VALUES (?,?,?,?)"
+		self._cursor.execute(stmt, [user_id, week_start, week_end, order_log])
 		self._conn.commit()
 
 	def get_login(self, username):
-		stmt = "SELECT username, password, id FROM users WHERE username = %s"
+		stmt = "SELECT username, password, id FROM users WHERE username = ?"
 		self._cursor.execute(stmt, [username])
 
 		row = self._cursor.fetchone()
@@ -95,29 +95,31 @@ class Connector(object):
 		return None
 
 	def check_user(self, username):
-		stmt = "SELECT id FROM users WHERE username = %s"
+		stmt = "SELECT id FROM users WHERE username = ?"
 		self._cursor.execute(stmt, [username])
 		user_id = self._cursor.fetchone()
+		user_id = user_id[0] if user_id else None
 		return user_id
 
 	def check_k_user(self, username):
-		stmt = "SELECT id FROM config WHERE k_username = %s"
+		stmt = "SELECT id FROM config WHERE k_username = ?"
 		self._cursor.execute(stmt, [username])
 		user_id = self._cursor.fetchone()
+		user_id = user_id[0] if user_id else None
 		return user_id
 
 	def add_user(self, username, password):
-		stmt = "INSERT INTO users (username, password) VALUES (%s, %s)"
+		stmt = "INSERT INTO users (username, password) VALUES (?, ?)"
 		self._cursor.execute(stmt, [username, password])
 		self._conn.commit()
 
 	def add_user_config(self, k_username, k_password):
-		stmt = "INSERT INTO config (k_username, k_password) VALUES (%s, %s)"
+		stmt = "INSERT INTO config (k_username, k_password) VALUES (?, ?)"
 		self._cursor.execute(stmt, [k_username, k_password])
 		self._conn.commit()
 
 	def get_log(self, user_id):
-		stmt = "SELECT strftime('%d.%m.%Y',week_start),strftime('%d.%m.%Y',week_end),strftime('%T %d.%m.%Y', updated_at),order_log FROM log WHERE id = ?"
+		stmt = "SELECT strftime('%d.%m.%Y',week_start),strftime('%d.%m.%Y',week_end),strftime('%H:%M %d.%m.%Y', updated_at),order_log FROM log WHERE id = ?"
 		self._cursor.execute(stmt, [user_id])
 
 		row = self._cursor.fetchone()
@@ -148,14 +150,14 @@ class Connector(object):
 
 	def set_preferences(self, user_id, index, blacklist):
 		stmt = "UPDATE config SET conf_index=?, blacklist=? WHERE id = ?"
-		self._cursor.execute(stmt, (index, blacklist, user_id))
+		self._cursor.execute(stmt, [index, blacklist, user_id])
 		self._conn.commit()
 
 	def set_profile(self, user_id, email, xxl, k_username, k_password=None):
 		if k_password:
 			stmt = "UPDATE config SET k_username=?, k_password=?, xxl=?, email=? WHERE id = ?";
-			self._cursor.execute(stmt, (k_username, k_password, xxl, email, user_id))
+			self._cursor.execute(stmt, [k_username, k_password, xxl, email, user_id])
 		else:
 			stmt = "UPDATE config SET k_username=?, xxl=?, email=? WHERE id = ?";
-			self._cursor.execute(stmt, (k_username, xxl, email, user_id))
+			self._cursor.execute(stmt, [k_username, xxl, email, user_id])
 		self._conn.commit()
