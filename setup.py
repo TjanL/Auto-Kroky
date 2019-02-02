@@ -1,4 +1,3 @@
-from subprocess import call
 import argparse
 import os
 import sys
