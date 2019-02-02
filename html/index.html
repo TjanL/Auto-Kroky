@@ -25,7 +25,7 @@
 		<i class="material-icons white-text brand-logo center hide-on-med-and-up show-on-medium">restaurant</i>
 		<div class="nav-wrapper">
 		  <ul class="right">
-			<li><div id="username" class="grey darken-4 white-text chip center dropdown-logout" style="min-width: 80px;" data-activates='dropdown1'><?php echo htmlspecialchars($_SESSION['username']); ?></div></li>
+			<li><div id="username" class="grey darken-4 white-text chip center dropdown-logout" style="min-width: 80px;" data-activates='dropdown1'></div></li>
 			<ul id='dropdown1' class='dropdown-content'>
 				<li><a href="logout" class="grey-text text-darken-4"><i class="material-icons">exit_to_app</i>Odjava</a></li>
 			</ul>
@@ -98,8 +98,9 @@
 
 </body>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 <script src="/public/js/main.js"></script>
+<script src="/public/js/log.js"></script>
 
 </html>
