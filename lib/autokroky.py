@@ -4,6 +4,7 @@ from random import choice
 import datetime
 import argparse
 import json
+import os
 
 
 class Order(object):
@@ -48,7 +49,8 @@ class Order(object):
 			settings = json.load(f)
 			f.close()
 
-		db = Connector(settings["database"]["user"], settings["database"]["password"], "autoMalica")
+		db = Connector(os.path.abspath("../database.db"))
+		db.connect()
 		results = db.get_config(user_id)
 
 		for user in results:
@@ -120,8 +122,8 @@ class Order(object):
 					log[teden[dan]] = item_choice.ime
 			# ------------------------------------------------------------------------------------------- #
 
-			log = json.dumps(log, ensure_ascii=False).encode('utf8')
-			db.set_log(user_id, monday.strftime("%Y.%m.%d"), friday.strftime("%Y.%m.%d"), log)
+			log = json.dumps(log, ensure_ascii=False)#.encode('utf8')
+			db.set_log(user_id, monday.strftime("%Y-%m-%d"), friday.strftime("%Y-%m-%d"), log)
 
 			if user["email"]:
 				k.send_email()
