@@ -3,39 +3,44 @@ import kroky_lib2
 import cherrypy
 import glob
 import os
+import json
 import database
 
 
 class WebServer(object):
 	def __init__(self):
-		# Preload html files
+		# Preload html files to RAM
 		self.html_files = {}
 		for file in glob.glob(os.path.abspath("../html/*.html")):
 			self.html_files[os.path.basename(file)] = open(file, encoding="utf8").read()
 
 	@cherrypy.tools.register("before_handler")
-	def require_auth():
-		if not cherrypy.session.get("username"):
+	def require_site_auth():
+		if cherrypy.session.get("username") is None:
 			raise cherrypy.HTTPRedirect("/login")
 
 	@cherrypy.expose
-	@cherrypy.tools.require_auth()
+	@cherrypy.tools.require_site_auth()
 	def index(self):
 		return self.html_files["index.html"]
 
 	@cherrypy.expose
-	@cherrypy.tools.require_auth()
+	@cherrypy.tools.require_site_auth()
 	def profile(self):
 		return self.html_files["profile.html"]
 
 	@cherrypy.expose
-	@cherrypy.tools.require_auth()
+	@cherrypy.tools.require_site_auth()
 	def preferences(self):
 		return self.html_files["preferences.html"]
 
 	@cherrypy.expose
 	def login(self):
 		return self.html_files["login.html"]
+
+	@cherrypy.expose
+	def register(self):
+		return self.html_files["register.html"]
 
 	@cherrypy.expose
 	def logout(self):
@@ -55,28 +60,33 @@ class Api(object):
 		self._db = database.Connector(db_file_path)
 
 	def error_page(status, message, traceback, version):
-		return "<p>{}</p><span>{}</span><hr>Cherrpy {}".format(status, message, version)
+		return status
 
 	@cherrypy.tools.register("before_handler")
-	def require_auth():
-		if not cherrypy.session.get("id"):
-			return {"error": "Not logged in!"}
+	def require_api_auth():
+		if cherrypy.session.get("username") is None:
+			raise cherrypy.HTTPError(401, "Unauthorized")
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.allow(methods=["GET"])
+	@cherrypy.tools.allow(methods=["POST"])
 	def login(self):
 		input_json = cherrypy.request.json
 		if input_json["username"] and input_json["password"]:
 			self._db.connect()
-			username, hash_pass, user_id = self._db.get_login(input_json["username"])
+			user = self._db.get_login(input_json["username"])
 			self._db.close()
-			if pbkdf2_sha256.verify(input_json["password"], hash_pass):
-				cherrypy.session["username"] = username
-				cherrypy.session["id"] = user_id
+			if user:
+				username, hash_pass, user_id = user
+				if pbkdf2_sha256.verify(input_json["password"], hash_pass):
+					cherrypy.session["username"] = username
+					cherrypy.session["id"] = user_id
+					return {"status": "Logged in"}
+				else:
+					return {"status": "Password incorrect"}
 			else:
-				return {"error": "Username or password incorrect!"}
+				return {"status": "Username not registered"}
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
@@ -87,30 +97,37 @@ class Api(object):
 		self._db.connect()
 		if input_json["username"]:
 			if self._db.check_user(input_json["username"]):
-				return {"error": "Username already taken!"}
+				return {"status": "Username already taken"}
 
-		elif input_json["password"]:
+		if input_json["password"]:
 			if len(input_json["password"]) < 6:
-				return {"error": "Password must have atleast 6 characters"}
+				return {"status": "Password must have atleast 6 characters"}
 			elif input_json["c_password"] != input_json["password"]:
-				return {"error": "Passwords did not match"}
+				return {"status": "Passwords do not match"}
 
-		if self._db.check_k_user(input_json["k_username"]):
-			return {"error": "This username is already in use"}
+		if input_json["k_username"] and input_json["k_password"]:
+			if self._db.check_k_user(input_json["k_username"]):
+				return {"status": "This username is already in use"}
 
-		if not kroky_lib2.User(input_json["k_username"], input_json["k_password"]):
-			return {"error": "Username or password incorrect"}
+			try:
+				kroky_lib2.User(input_json["k_username"], input_json["k_password"])
+			except ValueError:
+				return {"status": "Username or password incorrect"}
+		else:
+			return None
 
 		self._db.add_user(input_json["username"], pbkdf2_sha256.hash(input_json["password"]))
 		self._db.add_user_config(input_json["k_username"], input_json["k_password"])
-		self._db.close()
 
 		cherrypy.session["username"] = input_json["username"]
 		cherrypy.session["id"] = self._db.check_user(input_json["username"])
+		self._db.close()
+
+		return {"status": "Registered"}
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.require_auth()
+	@cherrypy.tools.require_api_auth()
 	@cherrypy.tools.allow(methods=["GET"])
 	def get_order(self):
 		self._db.connect()
@@ -121,15 +138,15 @@ class Api(object):
 
 			return {
 				"weekStart": week_start,
-				"weekEnd": weekEnd,
+				"weekEnd": week_end,
 				"updated": updated_at,
-				"log": order_log
+				"log": json.loads(order_log)
 			}
 		return {}
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.require_auth()
+	@cherrypy.tools.require_api_auth()
 	@cherrypy.tools.allow(methods=["GET"])
 	def get_preferences(self):
 		self._db.connect()
@@ -137,6 +154,8 @@ class Api(object):
 		self._db.close()
 		if preferences:
 			conf_index, blacklist = preferences
+			conf_index = json.loads(conf_index) if conf_index else None
+			blacklist = json.loads(blacklist) if blacklist else None
 			return {
 				"index": conf_index,
 				"blacklist": blacklist
@@ -145,7 +164,7 @@ class Api(object):
 
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.require_auth()
+	@cherrypy.tools.require_api_auth()
 	@cherrypy.tools.allow(methods=["GET"])
 	def get_profile(self):
 		self._db.connect()
@@ -160,31 +179,36 @@ class Api(object):
 			}
 		return {}
 
-	#@cherrypy.tools.require_auth()
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
 	@cherrypy.tools.json_out()
+	@cherrypy.tools.require_api_auth()
 	@cherrypy.tools.allow(methods=["POST"])
 	def update_preferences(self):
 		input_json = cherrypy.request.json
+		print(input_json)
 		self._db.connect()
 		self._db.set_preferences(cherrypy.session.get("id"),
-								 input_json["levels"],
-								 input_json["blacklist"]
+								 json.dumps(input_json["levels"]),
+								 json.dumps(input_json["blacklist"])
 								)
 		self._db.close()
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
 	@cherrypy.tools.json_out()
+	@cherrypy.tools.require_api_auth()
 	@cherrypy.tools.allow(methods=["POST"])
 	def update_profile(self):
 		input_json = cherrypy.request.json
 		self._db.connect()
-		if input_json["pass"]:
-			if not kroky_lib2.User(input_json["user"], input_json["pass"]):
-				return {"error": "Username or password incorrect"}
 
+		try:
+			kroky_lib2.User(input_json["user"], input_json["pass"])
+		except ValueError:
+			return {"status": "Username or password incorrect"}
+
+		if input_json["pass"]:
 			self._db.set_profile(cherrypy.session.get("id"),
 								 input_json["email"],
 								 input_json["xxl"],
@@ -199,6 +223,18 @@ class Api(object):
 								)
 		self._db.close()
 
+	@cherrypy.expose
+	@cherrypy.tools.json_out()
+	@cherrypy.tools.require_api_auth()
+	@cherrypy.tools.allow(methods=["GET"])
+	def get_user(self):
+		return {"username": cherrypy.session.get("username")}
+
+	@cherrypy.expose
+	@cherrypy.tools.json_in()
+	@cherrypy.tools.json_out()
+	@cherrypy.tools.require_api_auth()
+	@cherrypy.tools.allow(methods=["POST"])
 	def run_auto_kroky(self):
 		input_json = cherrypy.request.json
 
@@ -214,8 +250,8 @@ class Api(object):
 if __name__ == '__main__':
 	conf = {
 	   '/': {
-		   'tools.sessions.on': True,
-		   'error_page.default': WebServer.error_page
+			'tools.sessions.on': True,
+			'error_page.default': WebServer.error_page
 		},
 		'/public': {
 			'tools.staticdir.on': True,
@@ -225,15 +261,12 @@ if __name__ == '__main__':
 
 	api_conf = {
 		'/': {
-			   'tools.sessions.on': True,
-			   'error_page.default': Api.error_page
+			'tools.sessions.on': True,
+			'error_page.default': Api.error_page
 			}
 	}
 
-	api = Api(os.path.abspath("../database.db"))
-	api.login = api.login
-
 	cherrypy.tree.mount(WebServer(), '/', conf)
-	cherrypy.tree.mount(api, '/api', api_conf)
+	cherrypy.tree.mount(Api(os.path.abspath("../database.db"), '/api', api_conf)
 	cherrypy.server.socket_host = "127.0.0.1"
 	cherrypy.engine.start()
