@@ -40,7 +40,7 @@ $("#shrani").click(function() {
 		url: "/api/update_profile",
 		data: JSON.stringify({"xxl": xxl, "email": email, "user": user,"pass": pass}),
 		success: function(data) {
-			if (data != "Login error") {
+			if (data["status"] != "Username or password incorrect") {
 				Materialize.toast('Shranjeno!', 4000) // 4000 is the duration of the toast
 			} else {
 				$("#k_username").addClass("invalid");
@@ -53,11 +53,13 @@ $("#shrani").click(function() {
 		contentType: "application/json",
 		dataType: "json"
 	});
+});
 
 $("#order").click(function() {
 	$(".progress").fadeIn(500);
-	$.post("/api/runAutoMalica.php")
-		.done(function(data) {
+	$.post({
+		url: "/api/run_auto_kroky",
+		success: function() {
 			$(".progress").fadeOut(500);
 			if (data != "") {
 				data = parseInt(data/60)
@@ -79,9 +81,12 @@ $("#order").click(function() {
 			} else {
 				Materialize.toast('Naročeno!', 4000) // 4000 is the duration of the toast
 			}
-		})
-		.fail(function() {
+		},
+		error: function() {
 			$(".progress").fadeOut(500);
 			Materialize.toast('Napaka! Poskusite kasneje', 4000) // 4000 is the duration of the toast
-		});
+		},
+		contentType: "application/json",
+		dataType: "json"
+	});
 });

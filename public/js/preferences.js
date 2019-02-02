@@ -64,14 +64,14 @@ $.get({
 	url: "/api/get_preferences",
 	success: function(data) {
 		$(".progress").fadeOut(500);
-		if (data["index"] != null && data["index"].length > 0) {
+		if (data["index"].length > 0) {
 			for (var i = 0; i < data["index"].length; i++) {
 				addLevel(data["index"][i]);
 			}
 		} else {
 			addLevel();
 		}
-		if (data["blacklist"] != null) {
+		if (data["index"].length > 0) {
 			addBlacklist(data["blacklist"]);
 		} else {
 			addBlacklist()
@@ -128,8 +128,8 @@ $("#shrani, #shrani1").click(function() {
 	}
 
 	$.post({
-		url: "/api/update_references",
-		data: JOSN.stringify({"levels": levels, "blacklist": blacklist}),
+		url: "/api/update_preferences",
+		data: JSON.stringify({"levels": levels, "blacklist": blacklist}),
 		success: function() {
 			$(".progress").fadeOut(500);
 			Materialize.toast('Shranjeno!', 4000) // 4000 is the duration of the toast
@@ -141,3 +141,4 @@ $("#shrani, #shrani1").click(function() {
 		contentType: "application/json",
 		dataType: "json"
 	});
+});
