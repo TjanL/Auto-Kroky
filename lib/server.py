@@ -1,17 +1,17 @@
 from passlib.hash import pbkdf2_sha256
-import kroky_lib2
+from .kroky_lib2 import User
+from .database import Connector
 import cherrypy
 import glob
 import os
 import json
-import database
 
 
-class WebServer(object):
-	def __init__(self):
+class Root(object):
+	def __init__(self, html_dir):
 		# Preload html files to RAM
 		self.html_files = {}
-		for file in glob.glob(os.path.abspath("../html/*.html")):
+		for file in glob.glob(os.path.join(html_dir, "*.html")):
 			self.html_files[os.path.basename(file)] = open(file, encoding="utf8").read()
 
 	@cherrypy.tools.register("before_handler")
@@ -57,7 +57,7 @@ class WebServer(object):
 
 class Api(object):
 	def __init__(self, db_file_path):
-		self._db = database.Connector(db_file_path)
+		self._db = Connector(db_file_path)
 
 	def error_page(status, message, traceback, version):
 		return status
@@ -110,7 +110,7 @@ class Api(object):
 				return {"status": "This username is already in use"}
 
 			try:
-				kroky_lib2.User(input_json["k_username"], input_json["k_password"])
+				User(input_json["k_username"], input_json["k_password"])
 			except ValueError:
 				return {"status": "Username or password incorrect"}
 		else:
@@ -186,7 +186,6 @@ class Api(object):
 	@cherrypy.tools.allow(methods=["POST"])
 	def update_preferences(self):
 		input_json = cherrypy.request.json
-		print(input_json)
 		self._db.connect()
 		self._db.set_preferences(cherrypy.session.get("id"),
 								 json.dumps(input_json["levels"]),
@@ -204,7 +203,7 @@ class Api(object):
 		self._db.connect()
 
 		try:
-			kroky_lib2.User(input_json["user"], input_json["pass"])
+			User(input_json["user"], input_json["pass"])
 		except ValueError:
 			return {"status": "Username or password incorrect"}
 
@@ -248,10 +247,10 @@ class Api(object):
 
 
 if __name__ == '__main__':
-	conf = {
+	root_conf = {
 	   '/': {
 			'tools.sessions.on': True,
-			'error_page.default': WebServer.error_page
+			'error_page.default': Root.error_page
 		},
 		'/public': {
 			'tools.staticdir.on': True,
@@ -266,7 +265,7 @@ if __name__ == '__main__':
 			}
 	}
 
-	cherrypy.tree.mount(WebServer(), '/', conf)
-	cherrypy.tree.mount(Api(os.path.abspath("../database.db"), '/api', api_conf)
+	cherrypy.tree.mount(Root(os.path.abspath("../html")), '/', root_conf)
+	cherrypy.tree.mount(Api(os.path.abspath("../database.db")), '/api', api_conf)
 	cherrypy.server.socket_host = "127.0.0.1"
 	cherrypy.engine.start()

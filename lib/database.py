@@ -5,7 +5,7 @@ import os
 class Connector(object):
 	def __init__(self, database):
 		self._db_name = database
-		if not os.path.isfile(os.path.abspath(database)):
+		if not os.path.isfile(database):
 			self.connect()
 			self._create_users_table()
 			self._create_config_table()
@@ -119,7 +119,7 @@ class Connector(object):
 		self._conn.commit()
 
 	def get_log(self, user_id):
-		stmt = "SELECT strftime('%d.%m.%Y',week_start),strftime('%d.%m.%Y',week_end),strftime('%H:%M %d.%m.%Y', updated_at),order_log FROM log WHERE id = ?"
+		stmt = "SELECT strftime('%d.%m.%Y',week_start),strftime('%d.%m.%Y',week_end),strftime('%H:%M %d.%m.%Y', updated_at, 'localtime'),order_log FROM log WHERE id = ?"
 		self._cursor.execute(stmt, [user_id])
 
 		row = self._cursor.fetchone()
