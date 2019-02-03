@@ -1,10 +1,9 @@
-from kroky_lib2 import User
-from database import Connector
+from .kroky_lib2 import User
+from .database import Connector
 from random import choice
 import datetime
 import argparse
 import json
-import os
 
 
 class Order(object):
@@ -32,7 +31,7 @@ class Order(object):
 				return tmp
 			return -1
 
-	def __init__(self, single_user_id=None):
+	def __init__(self, database, single_user_id=None):
 		parser = argparse.ArgumentParser()
 		parser.add_argument("--user", type=int, nargs=1, help='ID of the user to order for')
 
@@ -45,11 +44,7 @@ class Order(object):
 		meniji = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 		log = {}
 
-		with open("../settings.conf", "r") as f:
-			settings = json.load(f)
-			f.close()
-
-		db = Connector(os.path.abspath("../database.db"))
+		db = Connector(database)
 		db.connect()
 		results = db.get_config(user_id)
 
