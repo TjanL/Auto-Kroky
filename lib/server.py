@@ -10,8 +10,9 @@ import json
 class Root(object):
 	def __init__(self, html_dir):
 		# Preload html files to RAM
+		self.html_dir = html_dir
 		self.html_files = {}
-		for file in glob.glob(os.path.join(html_dir, "*.html")):
+		for file in glob.glob(os.path.join(self.html_dir, "*.html")):
 			self.html_files[os.path.basename(file)] = open(file, encoding="utf8").read()
 
 	@cherrypy.tools.register("before_handler")
@@ -49,10 +50,10 @@ class Root(object):
 
 	@cherrypy.expose
 	def test(self):
-		return open(os.path.abspath("../html/test.html"), encoding="utf8").read()
+		return open(os.path.join(self.html_dir, "test.html"), encoding="utf8").read()
 
-	def error_page(status, message, traceback, version):
-		return open(os.path.abspath("../html/404.html"), encoding="utf8").read()
+	def error_page(self, status, message, traceback, version):
+		return open(os.path.join(self.html_dir, "404.html"), encoding="utf8").read()
 
 
 class Api(object):
@@ -246,11 +247,11 @@ class Api(object):
 		self._db.connect()
 		self._db.add_user("test", pbkdf2_sha256.hash("test"))
 		self._db.add_user_config("test", "test")
-		
+
 		user_id = self._db.check_user("test")
 		cherrypy.session["username"] = "test"
 		cherrypy.session["id"] = user_id
-		
+
 		log = {
 		"pon": "Puranji zrezek v sirovi omaki, peteršiljev riž, napitek",
 		"tor": "Sendvič s šunkarico in sirom, sadje, napitek",
@@ -259,16 +260,16 @@ class Api(object):
 		"pet": "Testenine carbonaro s pečeno slanino in stepenimi jajci, napitek"
 		}
 		self._db.set_log(user_id, "2019-02-11", "2019-02-15", json.dumps(log, ensure_ascii=False))
-		
+
 		index = [
 		["Puranji zrezek","Goveji stroganoff","skutni burek","skutni štruklji"],
 		["Kus kus s tunino","Krompirjevi svaljki","Hot dog","Sadni cmoki","Svinjski zrezek"],
 		["Cheeseburger","Pečena hrenovka v štručki s sirom","Piščančji dunajski zrezek"]
 		]
 		self._db.set_preferences(user_id, json.dumps(index, ensure_ascii=False), "[]")
-		
+
 		self._db.close()
-		
+
 		return {"username": "test", "password": "test", "index": index, "log": log}
 
 

@@ -28,10 +28,14 @@ class ScheduleThread(threading.Thread):
 class WebServer(object):
 	def __init__(self):
 		self.dirname = os.path.dirname(os.path.abspath(__file__))
+
+		self.root = server.Root(os.path.join(self.dirname, "html"))
+		self.api = server.Api(os.path.join(self.dirname, "database.db"))
+
 		self.root_conf = {
 		   '/': {
 				'tools.sessions.on': True,
-				'error_page.default': server.Root.error_page
+				'error_page.default': self.root.error_page
 			},
 			'/public': {
 				'tools.staticdir.on': True,
@@ -42,13 +46,13 @@ class WebServer(object):
 		self.api_conf = {
 			'/': {
 				'tools.sessions.on': True,
-				'error_page.default': server.Api.error_page
+				'error_page.default': self.api.error_page
 				}
 		}
 
 	def run_server(self):
-		cherrypy.tree.mount(server.Root(os.path.join(self.dirname, "html")), '/', self.root_conf)
-		cherrypy.tree.mount(server.Api(os.path.join(self.dirname, "database.db")), '/api', self.api_conf)
+		cherrypy.tree.mount(self.root, '/', self.root_conf)
+		cherrypy.tree.mount(self.api, '/api', self.api_conf)
 		#cherrypy.server.socket_host = "192.168.1.11"
 		cherrypy.server.socket_port = 80
 		cherrypy.engine.start()
