@@ -241,9 +241,35 @@ class Api(object):
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
 	@cherrypy.tools.json_out()
-	@cherrypy.tools.allow(methods=["POST"])
+	@cherrypy.tools.allow(methods=["GET"])
 	def test(self):
-		print(cherrypy.request.json)
+		self._db.connect()
+		self._db.add_user("test", pbkdf2_sha256.hash("test"))
+		self._db.add_user_config("test", "test")
+		
+		user_id = self._db.check_user("test")
+		cherrypy.session["username"] = "test"
+		cherrypy.session["id"] = user_id
+		
+		log = {
+		"pon": "Puranji zrezek v sirovi omaki, peteršiljev riž, napitek",
+		"tor": "Sendvič s šunkarico in sirom, sadje, napitek",
+		"sre": "Kremni piščančji ragu s krompirjevimi svaljki, napitek",
+		"cet": "Sendvič s piščančjo poli salamo in sirom, sadje, napitek",
+		"pet": "Testenine carbonaro s pečeno slanino in stepenimi jajci, napitek"
+		}
+		self._db.set_log(user_id, "2019-02-11", "2019-02-15", json.dumps(log, ensure_ascii=False))
+		
+		index = [
+		["Puranji zrezek","Goveji stroganoff","skutni burek","skutni štruklji"],
+		["Kus kus s tunino","Krompirjevi svaljki","Hot dog","Sadni cmoki","Svinjski zrezek"],
+		["Cheeseburger","Pečena hrenovka v štručki s sirom","Piščančji dunajski zrezek"]
+		]
+		self._db.set_preferences(user_id, json.dumps(index, ensure_ascii=False), "[]")
+		
+		self._db.close()
+		
+		return {"username": "test", "password": "test", "index": index, "log": log}
 
 
 if __name__ == '__main__':
