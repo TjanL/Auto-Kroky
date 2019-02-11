@@ -4,23 +4,27 @@
 	<title></title>
 </head>
 <body>
+  <button id="btn">Add test user</button>
+  <div id="result"></div>
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
   crossorigin="anonymous"></script>
 <script type="text/javascript">
-$.post({
+$("#btn").click(function () {
+  $.get({
     url: "/api/test",
-    data: JSON.stringify({"levels": "levels", "blacklist": "blacklist"}),
     success: function(data) {
-        console.dir("Done: " + data)
+        $("#result").text(JSON.stringify(data));
     },
     error: function () {
-        console.dir('Sorry, an error occurred. Please try again later.');
+        $("#result").text('Sorry, an error occurred. Please try again later.');
     },
     contentType: 'application/json',
     dataType: 'json'
+  });
 });
+
 </script>
 </body>
 </html>
