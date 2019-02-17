@@ -28,6 +28,7 @@ $('.dropdown-logout').dropdown({
 $('select').material_select();
 
 $("#shrani").click(function() {
+	$(".progress").fadeIn(500);
 	$("#k_username").removeClass("invalid");
 	$("#k_password").removeClass("invalid");
 
@@ -38,17 +39,22 @@ $("#shrani").click(function() {
 
 	$.post({
 		url: "/api/update_profile",
-		data: JSON.stringify({"xxl": xxl, "email": email, "user": user,"pass": pass}),
+		data: JSON.stringify({"xxl": xxl, "email": email, "user": user, "pass": pass}),
 		success: function(data) {
-			if (data["status"] != "Username or password incorrect") {
-				Materialize.toast('Shranjeno!', 4000) // 4000 is the duration of the toast
-			} else {
+			if (!jQuery.isEmptyObject(data) && data["status"] == "Username or password incorrect") {
+				$(".progress").fadeOut(500);
+				Materialize.toast('Napačno uporabniško ime ali geslo!', 4000); // 4000 is the duration of the toast
 				$("#k_username").addClass("invalid");
 				$("#k_password").addClass("invalid");
+			} else {
+				$(".progress").fadeOut(500);
+				Materialize.toast('Shranjeno!', 4000); // 4000 is the duration of the toast
 			}
+			
 		},
 		error: function() {
-			Materialize.toast('Napaka! Poskusite kasneje', 4000) // 4000 is the duration of the toast
+			$(".progress").fadeOut(500);
+			Materialize.toast('Napaka! Poskusite kasneje', 4000); // 4000 is the duration of the toast
 		},
 		contentType: "application/json",
 		dataType: "json"
@@ -58,33 +64,33 @@ $("#shrani").click(function() {
 $("#order").click(function() {
 	$(".progress").fadeIn(500);
 	$.post({
-		url: "/api/run_auto_kroky",
-		success: function() {
+		url: "/api/order",
+		success: function(data) {
 			$(".progress").fadeOut(500);
-			if (data != "") {
-				data = parseInt(data/60)
-				switch(data) {
-					case "1":
+			if (!jQuery.isEmptyObject(data)) {
+				var cas = parseInt(data["status"] / 60);
+				switch(cas) {
+					case 1:
 						var min = " minuto";
 						break;
-					case "2":
+					case 2:
 						var min = " minuti";
 						break;
-					case "3":
-					case "4":
+					case 3:
+					case 4:
 						var min = " minute";
 						break;
 					default:
 						var min = " minut";
 				}
-				Materialize.toast('Počakajte še ' + data + min, 4000) // 4000 is the duration of the toast
+				Materialize.toast('Počakajte še ' + cas + min, 4000); // 4000 is the duration of the toast
 			} else {
-				Materialize.toast('Naročeno!', 4000) // 4000 is the duration of the toast
+				Materialize.toast('Naročeno!', 4000); // 4000 is the duration of the toast
 			}
 		},
 		error: function() {
 			$(".progress").fadeOut(500);
-			Materialize.toast('Napaka! Poskusite kasneje', 4000) // 4000 is the duration of the toast
+			Materialize.toast('Napaka! Poskusite kasneje', 4000); // 4000 is the duration of the toast
 		},
 		contentType: "application/json",
 		dataType: "json"
