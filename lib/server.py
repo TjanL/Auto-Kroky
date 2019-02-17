@@ -1,6 +1,8 @@
 from passlib.hash import pbkdf2_sha256
+from datetime import datetime
 from .kroky_lib2 import User
 from .database import Connector
+from .autokroky import Order
 import cherrypy
 import glob
 import os
@@ -117,8 +119,12 @@ class Api(object):
 		else:
 			return None
 
-		self._db.add_user(input_json["username"], pbkdf2_sha256.hash(input_json["password"]))
-		self._db.add_user_config(input_json["k_username"], input_json["k_password"])
+		self._db.add_user(
+			input_json["username"],
+			pbkdf2_sha256.hash(input_json["password"]),
+			input_json["k_username"],
+			input_json["k_password"]
+		)
 
 		cherrypy.session["username"] = input_json["username"]
 		cherrypy.session["id"] = self._db.check_user(input_json["username"])
@@ -203,12 +209,12 @@ class Api(object):
 		input_json = cherrypy.request.json
 		self._db.connect()
 
-		try:
-			User(input_json["user"], input_json["pass"])
-		except ValueError:
-			return {"status": "Username or password incorrect"}
-
 		if input_json["pass"]:
+			try:
+				User(input_json["user"], input_json["pass"])
+			except ValueError:
+				return {"status": "Username or password incorrect"}
+
 			self._db.set_profile(cherrypy.session.get("id"),
 								 input_json["email"],
 								 input_json["xxl"],
@@ -219,7 +225,6 @@ class Api(object):
 			self._db.set_profile(cherrypy.session.get("id"),
 								 input_json["email"],
 								 input_json["xxl"],
-								 input_json["user"]
 								)
 		self._db.close()
 
@@ -231,13 +236,31 @@ class Api(object):
 		return {"username": cherrypy.session.get("username")}
 
 	@cherrypy.expose
-	@cherrypy.tools.json_in()
 	@cherrypy.tools.json_out()
 	@cherrypy.tools.require_api_auth()
 	@cherrypy.tools.allow(methods=["POST"])
-	def run_auto_kroky(self):
-		input_json = cherrypy.request.json
+	def order(self):
+		self._db.connect()
+		log = self._db.get_log(cherrypy.session.get("id"))
+		self._db.close()
+		if log:
+			_, _, time, _ = log
+			now = datetime.now()
+			last = datetime.strptime(time, "%H:%M:%S %d.%m.%Y")
+			time_limit = 15 * 60 # 15 minutes
 
+			time_delta = now - last
+			if time_delta.total_seconds() >= time_limit:
+				obj = Order(self._db.file_path, cherrypy.session.get("id"))
+				del obj
+			else:
+				return {"status": time_limit - time_delta.total_seconds()}
+
+		# No previous order
+		obj = Order(self._db.file_path, cherrypy.session.get("id"))
+		del obj
+
+		return {}
 
 	@cherrypy.expose
 	@cherrypy.tools.json_in()
