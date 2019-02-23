@@ -38,11 +38,12 @@ class Connector(object):
 	def _create_log_table(self):
 		stmt = """CREATE TABLE log (
 				  'id' integer primary key autoincrement,
-				  'user_id' integer NOT NULL,
+				  'user_id' integer NOT NULL UNIQUE,
 				  'week_start' text,
 				  'week_end' text,
-				  'order_log' text,
-				  'updated_at' timestamp
+				  'order_log' text DEFAULT '{}',
+				  'updated_at' timestamp,
+				  FOREIGN KEY(user_id) REFERENCES users(id)
 				);"""
 		self._cursor.execute(stmt)
 		self._conn.commit()
@@ -73,8 +74,8 @@ class Connector(object):
 		return [dict(zip(columns, row)) for row in self._cursor.fetchall()]
 
 	def set_log(self, user_id, week_start, week_end, order_log):
-		stmt = "REPLACE INTO log (user_id, week_start, week_end, order_log) VALUES (?,?,?,?)"
-		self._cursor.execute(stmt, [user_id, week_start, week_end, order_log])
+		stmt = "UPDATE log SET week_start = ?, week_end = ?, order_log = ? WHERE user_id = ?"
+		self._cursor.execute(stmt, [week_start, week_end, order_log, user_id])
 		self._conn.commit()
 
 	def get_login(self, username):
@@ -104,6 +105,11 @@ class Connector(object):
 	def add_user(self, username, password, k_username, k_password):
 		stmt = "INSERT INTO users (username, password, k_username, k_password) VALUES (?, ?, ?, ?)"
 		self._cursor.execute(stmt, [username, password, k_username, k_password])
+		self._conn.commit()
+
+	def add_user_log(self, user_id):
+		stmt = "INSERT INTO log (user_id) VALUES (?)"
+		self._cursor.execute(stmt, [user_id])
 		self._conn.commit()
 
 	def get_log(self, user_id):

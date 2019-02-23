@@ -125,10 +125,12 @@ class Api(object):
 			input_json["k_username"],
 			input_json["k_password"]
 		)
+		user_id = self._db.check_user(input_json["username"])
+		self._db.add_user_log(user_id)
+		self._db.close()
 
 		cherrypy.session["username"] = input_json["username"]
-		cherrypy.session["id"] = self._db.check_user(input_json["username"])
-		self._db.close()
+		cherrypy.session["id"] = user_id
 
 		return {"status": "Registered"}
 
@@ -268,12 +270,12 @@ class Api(object):
 	@cherrypy.tools.allow(methods=["GET"])
 	def test(self):
 		self._db.connect()
-		self._db.add_user("test", pbkdf2_sha256.hash("test"))
-		self._db.add_user_config("test", "test")
+		self._db.add_user("test", pbkdf2_sha256.hash("test"),"test", "test")
 
 		user_id = self._db.check_user("test")
 		cherrypy.session["username"] = "test"
 		cherrypy.session["id"] = user_id
+		self._db.add_user_log(user_id)
 
 		log = {
 		"pon": "Puranji zrezek v sirovi omaki, peteršiljev riž, napitek",
