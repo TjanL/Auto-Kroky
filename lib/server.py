@@ -257,10 +257,10 @@ class Api(object):
 				del obj
 			else:
 				return {"status": time_limit - time_delta.total_seconds()}
-
-		# No previous order
-		obj = Order(self._db.file_path, cherrypy.session.get("id"))
-		del obj
+		else:
+			# No previous order
+			obj = Order(self._db.file_path, cherrypy.session.get("id"))
+			del obj
 
 		return {}
 
