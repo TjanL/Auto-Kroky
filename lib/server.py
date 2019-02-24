@@ -38,6 +38,11 @@ class Root(object):
 		return self.html_files["preferences.html"]
 
 	@cherrypy.expose
+	@cherrypy.tools.require_site_auth()
+	def disclaimer(self):
+		return self.html_files["disclaimer.html"]
+
+	@cherrypy.expose
 	def login(self):
 		return self.html_files["login.html"]
 
