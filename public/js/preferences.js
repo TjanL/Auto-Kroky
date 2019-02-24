@@ -80,9 +80,7 @@ $.get({
 	dataType: "json"
 });
 
-$('.tabs').tabs({
-	swipeable: true
-});
+$('.tabs').tabs();
 
 $('.modal').modal({
 	onOpenStart: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
