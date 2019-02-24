@@ -3,7 +3,6 @@ $.get({
 	success: function(data){
 		$(".progress").fadeOut(500);
 		if (!jQuery.isEmptyObject(data)) {	
-			$('select').material_select();
 			$("#k_username").val(data["k_username"]);
 			$("#k_password").val("         ");
 
@@ -13,19 +12,6 @@ $.get({
 	},
 	dataType: "json"
 });
-
-// Initialize collapse button
-$(".button-collapse").sideNav({
-	menuWidth: 250
-});
-
-$('.dropdown-logout').dropdown({
-	constrainWidth: false, // Does not change width of dropdown to that of the activator
-	hover: true, // Activate on hover
-	alignment: 'center' // Displays dropdown with edge aligned to the left of button
-});
-
-$('select').material_select();
 
 $("#shrani").click(function() {
 	$(".progress").fadeIn(500);
@@ -43,18 +29,18 @@ $("#shrani").click(function() {
 		success: function(data) {
 			if (!jQuery.isEmptyObject(data) && data["status"] == "Username or password incorrect") {
 				$(".progress").fadeOut(500);
-				Materialize.toast('Napačno uporabniško ime ali geslo!', 4000); // 4000 is the duration of the toast
+				M.toast({html: 'Napačno uporabniško ime ali geslo!'});
 				$("#k_username").addClass("invalid");
 				$("#k_password").addClass("invalid");
 			} else {
 				$(".progress").fadeOut(500);
-				Materialize.toast('Shranjeno!', 4000); // 4000 is the duration of the toast
+				M.toast({html: 'Shranjeno!'});
 			}
 			
 		},
 		error: function() {
 			$(".progress").fadeOut(500);
-			Materialize.toast('Napaka! Poskusite kasneje', 4000); // 4000 is the duration of the toast
+			M.toast({html: 'Napaka! Poskusite kasneje'});
 		},
 		contentType: "application/json",
 		dataType: "json"
@@ -83,14 +69,14 @@ $("#order").click(function() {
 					default:
 						var min = " minut";
 				}
-				Materialize.toast('Počakajte še ' + cas + min, 4000); // 4000 is the duration of the toast
+				M.toast({html: 'Počakajte še ' + cas + min});
 			} else {
-				Materialize.toast('Naročeno!', 4000); // 4000 is the duration of the toast
+				M.toast({html: 'Naročeno!'});
 			}
 		},
 		error: function() {
 			$(".progress").fadeOut(500);
-			Materialize.toast('Napaka! Poskusite kasneje', 4000); // 4000 is the duration of the toast
+			M.toast({html: 'Napaka! Poskusite kasneje'});
 		},
 		contentType: "application/json",
 		dataType: "json"

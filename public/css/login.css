@@ -14,3 +14,22 @@ main {
 		padding-left: 0;
 	}
 }
+
+.card {
+	border-radius: 5px;
+}
+
+input:focus {
+	border-bottom: 1px solid #40c4ff !important;
+}
+
+.card-btn,
+.card-btn-bottom {
+	border-radius: 20px;
+	margin: -18px 15px;
+	text-transform: none;
+}
+
+.card-btn-bottom {
+	margin: -33px 15px;
+}

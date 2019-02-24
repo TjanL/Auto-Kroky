@@ -1,3 +1,4 @@
+$('.modal').modal();
 $("#register").click(function () {
 	var username = $("#username").val()
 	var password = $("#password").val()

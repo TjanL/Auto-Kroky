@@ -1,25 +1,77 @@
-body {
-	background-color: #f7f7f7;
-	display: flex;
-	min-height: 100vh;
-	flex-direction: column;
+header,
+main,
+footer {
+	padding-left: 230px;
 }
 
-main {
-	flex: 1 0 auto;
+.sidenav {
+	margin-top: 64px;
+	width: 230px;
+	height: 100%;
 }
 
-header, main, footer, nav {
-	padding-left: 250px;
+.sidenav-footer {
+	position: fixed;
+	bottom: 64px;
+	width: 100%;
 }
 
-@media only screen and (max-width : 992px) {
-	header, main, footer, nav {
+@media only screen and (max-width: 992px) {
+	header,
+	main,
+	footer {
 		padding-left: 0;
+	}
+	.sidenav {
+		margin-top: 0;
+	}
+	.sidenav-footer {
+		bottom: 0;
 	}
 }
 
-.select-dropdown {
-	overflow-y: auto !important;
-	max-height: 400px;
+.card {
+	border-radius: 5px;
+}
+
+.preloader {
+	min-height: 4px;
+	margin: .5rem 0 1rem 0;
+}
+
+.card-btn,
+.card-btn-bottom {
+	border-radius: 20px;
+	margin: -18px 15px;
+	text-transform: none;
+}
+
+.card-btn-bottom {
+	margin: -33px 15px;
+}
+
+.tabs .indicator {
+	background-color: #40c4ff;
+}
+
+.tabs .tab a:focus,
+.tabs .tab a:focus.active {
+	background-color: #e1f5fe;
+}
+
+.switch label input[type=checkbox]:checked+.lever {
+	background-color: #80d8ff;
+}
+
+.switch label input[type=checkbox]:checked+.lever:after {
+	background-color: #40c4ff;
+}
+
+.chip:focus {
+	background-color: #40c4ff;
+}
+
+.chips.focus,
+input:focus {
+	border-bottom: 1px solid #40c4ff !important;
 }

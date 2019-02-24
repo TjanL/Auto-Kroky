@@ -34,10 +34,10 @@ function addLevel(tags = []) {
 		chips[i] = {"tag": tags[i]};
 	}
 
-	$("#levels").append('<div id="level'+ levelNum +'"><h5><span>Nivo '+ levelNum +'</span><a href="#modal1" class="modal-trigger waves-effect waves-dark btn-flat right"><i class="material-icons">remove</i></a></h5><div class="chips"></div></div>');
-	Materialize.fadeInImage('#level'+ levelNum);
+	$("#levels").append('<div id="level'+ levelNum +'" style="display: none;"><h5><span>Nivo '+ levelNum +'</span><a href="#modal1" class="modal-trigger waves-effect waves-dark btn-flat right"><i class="material-icons">remove</i></a></h5><div class="chips"></div></div>');
+	$('#level'+ levelNum).fadeIn(500);
 
-	$('#level'+levelNum).find("div").material_chip({
+	$('#level'+levelNum).find("div").chips({
 		data: chips,
 		placeholder: 'npr. Skutni štruklji',
 		secondaryPlaceholder: 'Dodaj'
@@ -53,7 +53,7 @@ function addBlacklist(tags = []) {
 	}
 
 	$("#blacklistLevels").append('<div id="blacklistLevel"><div class="chips"></div></div>');
-	$('#blacklistLevel').find("div").material_chip({
+	$('#blacklistLevel').find("div").chips({
 		data: chips,
 		placeholder: 'npr. Piščanec',
 		secondaryPlaceholder: 'Dodaj'
@@ -80,21 +80,12 @@ $.get({
 	dataType: "json"
 });
 
-// Initialize collapse button
-$(".button-collapse").sideNav({
-	menuWidth: 250
-});
+$('.tabs').tabs();
 
 $('.modal').modal({
-	ready: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
+	onOpenStart: function(modal, trigger) { // Callback for Modal open. Modal and trigger parameters available.
 		lastRemove = trigger;
 	}
-});
-
-$('.dropdown-logout').dropdown({
-	constrainWidth: false, // Does not change width of dropdown to that of the activator
-	hover: true, // Activate on hover
-	alignment: 'center' // Displays dropdown with edge aligned to the left of button
 });
 
 $("#addLevel").click(function () { addLevel(); });
@@ -104,7 +95,7 @@ $("#shrani, #shrani1").click(function() {
 	var levels = [];
 	$("#levels > div").each(function() {
 		var tmp = [];
-		var chipData = $(this).children(".chips").material_chip('data');
+		var chipData = M.Chips.getInstance($(this).children(".chips")[0]).chipsData;
 		if (chipData.length != 0) {
 			for (var i = 0; i < chipData.length; i++) {
 				tmp.push(chipData[i]["tag"]);
@@ -120,7 +111,7 @@ $("#shrani, #shrani1").click(function() {
 	resetLevels();
 
 	var blacklist = [];
-	var chipData = $("#blacklistLevel").children(".chips").material_chip('data');
+	var chipData = M.Chips.getInstance($("#blacklistLevel").children(".chips")[0]).chipsData;
 	if (chipData.length != 0) {
 		for (var i = 0; i < chipData.length; i++) {
 			blacklist.push(chipData[i]["tag"]);
@@ -132,11 +123,11 @@ $("#shrani, #shrani1").click(function() {
 		data: JSON.stringify({"levels": levels, "blacklist": blacklist}),
 		success: function() {
 			$(".progress").fadeOut(500);
-			Materialize.toast('Shranjeno!', 4000) // 4000 is the duration of the toast
+			M.toast({html: 'Shranjeno!'})
 		},
 		error: function() {
 			$(".progress").fadeOut(500);
-			Materialize.toast('Napaka! Poskusite kasneje', 4000) // 4000 is the duration of the toast
+			M.toast({html: 'Napaka! Poskusite kasneje'})
 		},
 		contentType: "application/json",
 		dataType: "json"
