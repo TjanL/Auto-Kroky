@@ -30,48 +30,16 @@ footer {
 	}
 }
 
-.card {
-	border-radius: 5px;
-}
-
 .preloader {
 	min-height: 4px;
 	margin: .5rem 0 1rem 0;
 }
 
-.card-btn,
-.card-btn-bottom {
+.round-btn {
 	border-radius: 20px;
-	margin: -18px 15px;
 	text-transform: none;
 }
 
-.card-btn-bottom {
-	margin: -33px 15px;
-}
-
 .tabs .indicator {
-	background-color: #40c4ff;
-}
-
-.tabs .tab a:focus,
-.tabs .tab a:focus.active {
-	background-color: #e1f5fe;
-}
-
-.switch label input[type=checkbox]:checked+.lever {
-	background-color: #80d8ff;
-}
-
-.switch label input[type=checkbox]:checked+.lever:after {
-	background-color: #40c4ff;
-}
-
-.chip:focus {
-	background-color: #40c4ff;
-}
-
-.chips.focus,
-input:focus {
-	border-bottom: 1px solid #40c4ff !important;
+	background-color: #607d8b;
 }

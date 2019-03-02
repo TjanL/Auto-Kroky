@@ -19,10 +19,10 @@
    </head>
    <body class="grey lighten-5">
       <div class="navbar-fixed">
-         <nav class="white z-depth-0">
+         <nav class="blue-grey z-depth-0">
             <div class="nav-wrapper">
-               <a href="#" data-target="sidenav" class="black-text sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
-               <a href="/" class="black-text brand-logo"><i class="material-icons">restaurant</i>Auto Kroky</a>
+               <a href="#" data-target="sidenav" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+               <a href="/" class="brand-logo"><i class="material-icons">restaurant</i>Auto Kroky</a>
                <ul class="right hide-on-med-and-down">
                   <li><a id="username" class="black-text chip dropdown-trigger center" href="#" data-target="logout" style="min-width: 80px;">Username</a></li>
                </ul>
@@ -47,43 +47,48 @@
       <main>
          <div class="row">
             <div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
+            </div>
+         </div>
+         <div class="row">
+            <div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
                <h3>Naročanje</h3>
-               <a href="http://www.kroky.si" class="waves-effect waves-light btn right light-blue darken-2 z-depth-0 card-btn"><i class="material-icons left">launch</i>Ogled menija</a>
-               <div class="card z-depth-0 white">
-                  <div class="card-content black-text">
-                     <div class="preloader">
-                        <div class="progress light-blue lighten-4">
-                           <div class="indeterminate light-blue accent-2"></div>
-                        </div>
+               <div class="preloader">
+                  <div class="progress">
+                     <div class="indeterminate"></div>
+                  </div>
+               </div>
+               <ul class="tabs transparent">
+                  <li class="tab col s3"><a class="active black-text" href="#index">Indeks besed</a></li>
+                  <li class="tab col s3"><a class="black-text" href="#blacklist">Blacklist</a></li>
+                  <li class="indicator"></li>
+                  <a href="http://www.kroky.si" class="waves-effect waves-light btn right z-depth-0 round-btn"><i class="material-icons left">launch</i>Ogled menija</a>
+               </ul>
+               <div id="index">
+                  <p class="caption grey-text text-darken-1">Vpišite besede, ki se lahko pojavijo v malicah, ki jih želite. Nivoji si sledijo padajoče (<b>Nivo 1</b> - malica, ki vam je <b>najbolj všeč</b>, ...).</p>
+                  <div id="levels"></div>
+                  <div class="row">
+                     <div class="col s12">
+                        <a id="addLevel" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">add</i></a>
+                        <a id="shrani" class="waves-effect btn blue-grey right">Shrani</a>
                      </div>
-                     <ul class="tabs transparent">
-                        <li class="tab col s3"><a class="active black-text" href="#index">Indeks besed</a></li>
-                        <li class="tab col s3"><a class="black-text" href="#blacklist">Blacklist</a></li>
-                        <li class="indicator light-blue darken-2"></li>
-                     </ul>
-                     <div id="index">
-                        <p class="caption grey-text text-darken-1">Vpišite besede, ki se lahko pojavijo v malicah, ki jih želite. Nivoji si sledijo padajoče (<b>Nivo 1</b> - malica, ki vam je <b>najbolj všeč</b>, ...).</p>
-                        <div id="levels"></div>
-                        <div class="row"></div>
-                        <a id="addLevel" class="btn-floating btn-large waves-effect waves-light light-blue darken-2"><i class="material-icons">add</i></a>
-                        <a id="shrani" class="waves-effect btn light-blue accent-2 right">Shrani</a>
-                        <div id="modal1" class="modal">
-                           <div class="modal-content">
-                              <h4>Ali res želite izbrisati nivo?</h4>
-                              <p>Če kliknete <b>DA</b> bodo vse nastavitve za ta nivo izgubljene.</p>
-                           </div>
-                           <div class="modal-footer">
-                              <a class="modal-action modal-close waves-effect waves-dark btn-flat blue-text">Ne</a>
-                              <a class="modal-action modal-close waves-effect waves-dark btn-flat blue-text" onclick="removeLevel()">Da</a>
-                           </div>
-                        </div>
+                  </div>
+                  <div id="modal1" class="modal">
+                     <div class="modal-content">
+                        <h4>Ali res želite izbrisati nivo?</h4>
+                        <p>Če kliknete <b>DA</b> bodo vse nastavitve za ta nivo izgubljene.</p>
                      </div>
-                     <div id="blacklist">
-                        <p class="caption grey-text text-darken-1">Vpišite besede, ki se <b>ne smejo</b> pojaviti v malicah, ki jih želite.</p>
-                        <div id="blacklistLevels"></div>
-                        <div class="row">
-                           <a id="shrani1" class="waves-effect waves-light btn light-blue accent-2 right">Shrani</a>
-                        </div>
+                     <div class="modal-footer">
+                        <a class="modal-action modal-close waves-effect waves-dark btn-flat blue-text">Ne</a>
+                        <a class="modal-action modal-close waves-effect waves-dark btn-flat blue-text" onclick="removeLevel()">Da</a>
+                     </div>
+                  </div>
+               </div>
+               <div id="blacklist">
+                  <p class="caption grey-text text-darken-1">Vpišite besede, ki se <b>ne smejo</b> pojaviti v malicah, ki jih želite.</p>
+                  <div id="blacklistLevels"></div>
+                  <div class="row">
+                     <div class="col s12">
+                        <a id="shrani1" class="waves-effect waves-light btn blue-grey right">Shrani</a>
                      </div>
                   </div>
                </div>
