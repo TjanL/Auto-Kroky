@@ -1,5 +1,4 @@
 body {
-	background-color: #f7f7f7;
 	display: flex;
 	min-height: 100vh;
 	flex-direction: column;
@@ -13,4 +12,14 @@ main {
 	header, main, footer, nav {
 		padding-left: 0;
 	}
+}
+
+.round-btn {
+	border-radius: 20px;
+	margin: -33px 10px;
+	text-transform: none;
+}
+
+.card {
+	border-radius: 5px;
 }

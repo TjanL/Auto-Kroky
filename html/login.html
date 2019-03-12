@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <meta property="og:locale" content="sl_SI">
+      <meta property="og:url" content="https://autokroky.ddns.net">
+      <meta property="og:type" content="website">
+      <meta property="og:title" content="Auto Kroky avtomatsko naročanje malice">
+      <meta property="og:description" content="Enostavno avtomatsko naročanje malice na Kroky.si">
+      <meta property="og:image" content="https://autokroky.ddns.net/public/assets/ic_restaurant_black_128px.png">
+      <meta name="description" content="Enostavno avtomatsko naročanje malice na Kroky.si">
+      <meta name="author" content="Tjan Ljubešek">
+      <link rel="shortcut icon" type="image/ico" href="/public/assets/favicon.ico"/>
+      <title>Prijava - Auto Kroky</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="/public/css/login.css" rel="stylesheet">
+   </head>
+   <body class="grey lighten-4">
+      <main class="grey-text text-darken-4">
+         <div class="row"></div>
+         <div class="row">
+            <div class="col s12 offset-m3 m6 offset-l4 l4">
+               <div class="center-align">
+                  <h1 class="page-title" style="font-weight: 100;">Auto Kroky</h1>
+               </div>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col s12 offset-m3 m6 offset-l4 l4">
+               <div class="card z-depth-0">
+                  <div class="card-image blue-grey" style="height: 6rem; border-radius: 5px 5px 0 0;">
+                     <span class="card-title">Prijava</span>
+                  </div>
+                  <div class="card-content">
+                     <div class="input-field">
+                        <input id="username" type="text" class="validate">
+                        <label for="username">Uporabniško ime</label>
+                        <span id="username_helper" class="helper-text"></span>
+                     </div>
+                     <div class="input-field">
+                        <input id="password" type="password" class="validate">
+                        <label for="password">Geslo</label>
+                        <span id="password_helper" class="helper-text"></span>
+                     </div>
+                     <div>
+                        <button id="login" class="waves-effect waves-light btn blue-grey" type="submit">Vpis</button>
+                     </div>
+                  </div>
+               </div>
+               <a href="register" class="waves-effect waves-light btn right z-depth-0 round-btn"><i class="material-icons left">person_add</i>Registracija</a>
+            </div>
+         </div>
+      </main>
+      <footer class="page-footer transparent" style="padding-top: 0;">
+         <div class="footer-copyright transparent">
+            <div class="container">
+               <div class="center"><img src="/public/assets/ic_restaurant_black_48px.svg"></div>
+               <div class="center">
+                  <label>
+                  We are not affiliated, associated, authorized, endorsed by, or in any way officially connected with K-NORMA D.O.O., or any of its subsidiaries or its affiliates. The official Kroky website can be found at http://www.kroky.si. The name “Kroky” as well as related names, marks, emblems and images are registered trademarks of K-NORMA D.O.O..
+                  </label>
+               </div>
+            </div>
+         </div>
+      </footer>
+   </body>
+   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+   <script src="/public/js/login.js"></script>
+</html>

@@ -1,0 +1,45 @@
+header,
+main,
+footer {
+	padding-left: 230px;
+}
+
+.sidenav {
+	margin-top: 64px;
+	width: 230px;
+	height: 100%;
+}
+
+.sidenav-footer {
+	position: fixed;
+	bottom: 64px;
+	width: 100%;
+}
+
+@media only screen and (max-width: 992px) {
+	header,
+	main,
+	footer {
+		padding-left: 0;
+	}
+	.sidenav {
+		margin-top: 0;
+	}
+	.sidenav-footer {
+		bottom: 0;
+	}
+}
+
+.preloader {
+	min-height: 4px;
+	margin: .5rem 0 1rem 0;
+}
+
+.round-btn {
+	border-radius: 20px;
+	text-transform: none;
+}
+
+.tabs .indicator {
+	background-color: #607d8b;
+}

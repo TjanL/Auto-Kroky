@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <meta property="og:locale" content="sl_SI">
+      <meta property="og:url" content="https://autokroky.ddns.net">
+      <meta property="og:type" content="website">
+      <meta property="og:title" content="Auto Kroky avtomatsko naročanje malice">
+      <meta property="og:description" content="Enostavno avtomatsko naročanje malice na Kroky.si">
+      <meta property="og:image" content="https://autokroky.ddns.net/public/assets/ic_restaurant_black_128px.png">
+      <meta name="description" content="Enostavno avtomatsko naročanje malice na Kroky.si">
+      <meta name="author" content="Tjan Ljubešek">
+      <link rel="shortcut icon" type="image/ico" href="/public/assets/favicon.ico"/>
+      <title>Naročanje - Auto Kroky</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="/public/css/stylesheet.css" rel="stylesheet">
+   </head>
+   <body class="grey lighten-5">
+      <div class="navbar-fixed">
+         <nav class="blue-grey z-depth-0">
+            <div class="nav-wrapper">
+               <a href="#" data-target="sidenav" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+               <a href="/" class="brand-logo" style="font-weight: 100;"><i class="material-icons">restaurant</i>Auto Kroky</a>
+               <ul class="right hide-on-med-and-down">
+                  <li><a id="username" class="black-text chip dropdown-trigger center" href="#" data-target="logout" style="min-width: 80px;">Username</a></li>
+               </ul>
+            </div>
+         </nav>
+      </div>
+      <ul id="logout" class="dropdown-content">
+         <li><a href="logout" class="black-text"><i class="material-icons">exit_to_app</i>Odjava</a></li>
+      </ul>
+      <ul class="sidenav sidenav-fixed z-depth-0 grey lighten-4" id="sidenav">
+         <li><a href="index"><i class="material-icons">fastfood</i>Pregled</a></li>
+         <li><a href=""><i class="material-icons">tune</i>Naročanje</a></li>
+         <li><a href="profile"><i class="material-icons">account_circle</i>Profil</a></li>
+         <li class="hide-on-med-and-up"><a href="logout"><i class="material-icons">exit_to_app</i>Odjava</a></li>
+         <li class="sidenav-footer">
+            <a class="grey-text waves-effect" href="disclaimer">
+               <div class="center"><label>© 2019 - Disclaimer</label></div>
+            </a>
+         </li>
+      </ul>
+      <main>
+         <div class="row">
+            <div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
+            </div>
+         </div>
+         <div class="row">
+            <div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
+               <h3>Naročanje</h3>
+               <div class="preloader">
+                  <div class="progress">
+                     <div class="indeterminate"></div>
+                  </div>
+               </div>
+               <ul class="tabs transparent">
+                  <li class="tab col s3"><a class="active black-text transparent" href="#index">Indeks besed</a></li>
+                  <li class="tab col s3"><a class="black-text transparent" href="#blacklist">Blacklist</a></li>
+                  <a href="http://www.kroky.si" class="waves-effect waves-light btn right z-depth-0 round-btn"><i class="material-icons left">launch</i>Ogled menija</a>
+               </ul>
+               <div id="index">
+                  <p class="caption grey-text text-darken-1">Vpišite besede, ki se lahko pojavijo v malicah, ki jih želite. Nivoji si sledijo padajoče (<b>Nivo 1</b> - malica, ki vam je <b>najbolj všeč</b>, ...).</p>
+                  <div id="levels"></div>
+                  <div class="row">
+                     <div class="col s12">
+                        <a id="addLevel" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">add</i></a>
+                        <a id="shrani" class="waves-effect btn blue-grey right">Shrani</a>
+                     </div>
+                  </div>
+                  <div id="modal1" class="modal">
+                     <div class="modal-content">
+                        <h4>Ali res želite izbrisati nivo?</h4>
+                        <p>Če kliknete <b>DA</b> bodo vse nastavitve za ta nivo izgubljene.</p>
+                     </div>
+                     <div class="modal-footer">
+                        <a class="modal-action modal-close waves-effect waves-dark btn-flat blue-text">Ne</a>
+                        <a class="modal-action modal-close waves-effect waves-dark btn-flat blue-text" onclick="removeLevel()">Da</a>
+                     </div>
+                  </div>
+               </div>
+               <div id="blacklist">
+                  <p class="caption grey-text text-darken-1">Vpišite besede, ki se <b>ne smejo</b> pojaviti v malicah, ki jih želite.</p>
+                  <div id="blacklistLevels"></div>
+                  <div class="row">
+                     <div class="col s12">
+                        <a id="shrani1" class="waves-effect waves-light btn blue-grey right">Shrani</a>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </main>
+   </body>
+   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+   <script src="/public/js/main.js"></script>
+   <script src="/public/js/preferences.js"></script>
+</html>
