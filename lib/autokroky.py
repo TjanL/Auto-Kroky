@@ -2,19 +2,21 @@ from .kroky_lib2 import User
 from .database import Connector
 from random import choice
 import datetime
-import argparse
 import json
 
 
-class Order(object):
+class Order():
+
+	teden = ["pon", "tor", "sre", "cet", "pet"]
+	meniji = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 	class Item(object):
 		def __init__(self, user, dan, meni, index, blacklist):
 			self.ime = user.get_snack(dan, meni)
 			self.meni = meni
-			self.ocena = self._get_grade(index, blacklist)
+			self.ocena = self.get_grade(reversed(index), blacklist)
 
-		def _get_grade(self, index, blacklist):
+		def get_grade(self, index, blacklist):
 			if self.ime != False: # If "False", day is canceled
 				tmp = 0
 				for block in blacklist:
@@ -31,19 +33,39 @@ class Order(object):
 				return tmp
 			return -1
 
-	def __init__(self, database, single_user_id=None):
-		parser = argparse.ArgumentParser()
-		parser.add_argument("--user", type=int, nargs=1, help='ID of the user to order for')
+	def get_blacklist(user_config):
+		blacklist = json.loads(user_config["blacklist"])
+		if blacklist is None:
+			blacklist = []
+		return blacklist
 
-		args = parser.parse_args()
-		user_id = args.user[0] if args.user else single_user_id
+	def get_index(user_config):
+		index = json.loads(user_config["conf_index"])
+		if index is None:
+			index = []
+		return index
 
-		print("###############\n# Auto malica #\n###############")
+	def order_item(k_user, user_config, dan, choice_list):
+		if choice_list[-1].ocena == -1:						# If last item is "False"
+			return "Canceled"
 
-		teden = ["pon", "tor", "sre", "cet", "pet"]
-		meniji = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-		log = {}
+		elif choice_list[0].ocena == 0:						# If the first item (best item) has grade 0
+			if user_config["xxl"] and k_user.get_snack_xxl(dan, k_user.default_menu):
+				k_user.set_snack_xxl(dan, k_user.default_menu)
 
+			return "{} (Default menu)".format(k_user.get_snack(dan, k_user.default_menu))
+
+		else:											# Randomly choose between best items
+			item_choice = choice(choice_list)
+
+			if user_config["xxl"] and k_user.get_snack_xxl(dan, item_choice.meni):
+				k_user.set_snack_xxl(dan, item_choice.meni)
+			else:
+				k_user.set_snack(dan, item_choice.meni)
+
+			return item_choice.ime
+
+	def run(database, user_id=None):
 		db = Connector(database)
 		db.connect()
 		results = db.get_config(user_id)
@@ -52,14 +74,8 @@ class Order(object):
 			if user_id is None:
 				user_id = user["id"]
 
-			blacklist = json.loads(user["blacklist"])
-			if blacklist is None:
-				blacklist = []
-
-			index = json.loads(user["conf_index"])
-			if index is None:
-				index = []
-			index.reverse()
+			blacklist = Order.get_blacklist(user)
+			index = Order.get_index(user)
 
 			print("\n"+user["k_username"])
 			if not index:
@@ -72,13 +88,10 @@ class Order(object):
 				print(e)
 				continue
 
-			monday = datetime.datetime.strptime(k.week, "%d.%m.%Y")
-			friday = monday.date() + datetime.timedelta(days=4)
-			print("-------------------|", monday.strftime("%d.%m.%Y"), "-", friday.strftime("%d.%m.%Y"), "|-------------------")
-
-			for dan in range(len(teden)):
+			log = {}
+			for dan in range(len(Order.teden)):
 				# Get item grades
-				item = [self.Item(k, dan, meni, index, blacklist) for meni in meniji]
+				item = [Order.Item(k, dan, meni, index, blacklist) for meni in Order.meniji]
 
 				# Sort items by grade - first is the best choice
 				item.sort(key=lambda x: (x.ocena), reverse=True)
@@ -91,33 +104,14 @@ class Order(object):
 				for i in item:
 					if i.ocena == choice_list[0].ocena or i.ocena == -1:
 						choice_list.append(i)
-					else: break
-
-			# ------------------------------------------------------------------------------------------- #
-				if choice_list[-1].ocena == -1:						# If last item is "False"
-					print(teden[dan].capitalize(), ":", "Canceled")
-					log[teden[dan]] = "Canceled"
-
-				elif choice_list[0].ocena == 0:						# If the first item (best item) has grade 0
-					if user["xxl"] and k.get_snack_xxl(dan, k.default_menu):
-						k.set_snack_xxl(dan, k.default_menu)
-
-					print(teden[dan].capitalize(), ":", "{} (Default menu)".format(k.get_snack(dan, k.default_menu)))
-					log[teden[dan]] = "{} (Default menu)".format(k.get_snack(dan, k.default_menu))
-
-				else:											# Randomly choose between best items
-					item_choice = choice(choice_list)
-
-					if user["xxl"] and k.get_snack_xxl(dan, item_choice.meni):
-						k.set_snack_xxl(dan, item_choice.meni)
 					else:
-						k.set_snack(dan, item_choice.meni)
+						break
 
-					print(teden[dan].capitalize(), ":", item_choice.ime)
-					log[teden[dan]] = item_choice.ime
-			# ------------------------------------------------------------------------------------------- #
+				log[Order.teden[dan]] = Order.order_item(k, user, dan, choice_list)
 
 			log = json.dumps(log, ensure_ascii=False)#.encode('utf8')
+			monday = datetime.datetime.strptime(k.week, "%d.%m.%Y")
+			friday = monday.date() + datetime.timedelta(days=4)
 			db.set_log(user_id, monday.strftime("%Y-%m-%d"), friday.strftime("%Y-%m-%d"), log)
 
 			if user["email"]:
@@ -125,7 +119,8 @@ class Order(object):
 				print("Email send!")
 
 		db.close()
+		print("Done")
 
 
 if __name__ == '__main__':
-	Order()
+	Order().run()

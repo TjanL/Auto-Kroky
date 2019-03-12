@@ -55,10 +55,6 @@ class Root(object):
 		cherrypy.lib.sessions.expire()
 		raise cherrypy.HTTPRedirect("/login")
 
-	@cherrypy.expose
-	def test(self):
-		return open(os.path.join(self.html_dir, "test.html"), encoding="utf8").read()
-
 	def error_page(self, status, message, traceback, version):
 		return open(os.path.join(self.html_dir, "404.html"), encoding="utf8").read()
 
@@ -258,50 +254,14 @@ class Api(object):
 
 			time_delta = now - last
 			if time_delta.total_seconds() >= time_limit:
-				obj = Order(self._db.file_path, cherrypy.session.get("id"))
-				del obj
+				Order.run(self._db.file_path, cherrypy.session.get("id"))
 			else:
 				return {"status": time_limit - time_delta.total_seconds()}
 		else:
 			# No previous order
-			obj = Order(self._db.file_path, cherrypy.session.get("id"))
-			del obj
+			Order.run(self._db.file_path, cherrypy.session.get("id"))
 
 		return {}
-
-	@cherrypy.expose
-	@cherrypy.tools.json_in()
-	@cherrypy.tools.json_out()
-	@cherrypy.tools.allow(methods=["GET"])
-	def test(self):
-		self._db.connect()
-		self._db.add_user("test", pbkdf2_sha256.hash("test"),"test", "test")
-
-		user_id = self._db.check_user("test")
-		cherrypy.session["username"] = "test"
-		cherrypy.session["id"] = user_id
-		self._db.add_user_log(user_id)
-
-		log = {
-		"pon": "Puranji zrezek v sirovi omaki, peteršiljev riž, napitek",
-		"tor": "Sendvič s šunkarico in sirom, sadje, napitek",
-		"sre": "Kremni piščančji ragu s krompirjevimi svaljki, napitek",
-		"cet": "Sendvič s piščančjo poli salamo in sirom, sadje, napitek",
-		"pet": "Testenine carbonaro s pečeno slanino in stepenimi jajci, napitek"
-		}
-		self._db.set_log(user_id, "2019-02-11", "2019-02-15", json.dumps(log, ensure_ascii=False))
-
-		index = [
-		["Puranji zrezek","Goveji stroganoff","skutni burek","skutni štruklji"],
-		["Kus kus s tunino","Krompirjevi svaljki","Hot dog","Sadni cmoki","Svinjski zrezek"],
-		["Cheeseburger","Pečena hrenovka v štručki s sirom","Piščančji dunajski zrezek"]
-		]
-		self._db.set_preferences(user_id, json.dumps(index, ensure_ascii=False), "[]")
-
-		self._db.close()
-
-		return {"username": "test", "password": "test", "index": index, "log": log}
-
 
 if __name__ == '__main__':
 	root_conf = {

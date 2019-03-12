@@ -14,11 +14,10 @@ class ScheduleThread(threading.Thread):
 		self.dirname = os.path.dirname(os.path.abspath(__file__))
 
 	def order(self):
-		obj = autokroky.Order(os.path.join(self.dirname, "database.db"))
-		del obj
+		autokroky.Order.run(os.path.join(self.dirname, "database.db"))
 
 	def run(self):
-		schedule.every().wednesday.at("12:00").do(self.order)
+		schedule.every().tuesday.at("12:00").do(self.order)
 
 		while True:
 			schedule.run_pending()
@@ -53,7 +52,6 @@ class WebServer(object):
 	def run_server(self):
 		cherrypy.tree.mount(self.root, '/', self.root_conf)
 		cherrypy.tree.mount(self.api, '/api', self.api_conf)
-		#cherrypy.server.socket_host = "192.168.1.11"
 		cherrypy.server.socket_port = 80
 		cherrypy.engine.start()
 
