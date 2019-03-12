@@ -12,21 +12,21 @@ $("#login").click(function () {
 						break;
 					case "Username not registered":
 						$("#username").addClass("invalid");
-						$("[for=username]").attr("data-error", data["status"]);
+						$("username_helper").attr("data-error", data["status"]);
 						break;
 					case "Password incorrect":
 						$("#password").addClass("invalid");
-						$("[for=password]").attr("data-error", data["status"]);
+						$("#password_helper").attr("data-error", data["status"]);
 						break;
 				}
 			} else {
 				if ($("#username").val() == "") {
 					$("#username").addClass("invalid");
-					$("[for=username]").attr("data-error", "Field empty");
+					$("username_helper").attr("data-error", "Field empty");
 				}
 				if ($("#password").val() == "") {
 					$("#password").addClass("invalid");
-					$("[for=password]").attr("data-error", "Field empty");
+					$("#password_helper").attr("data-error", "Field empty");
 				}
 			}
 		},

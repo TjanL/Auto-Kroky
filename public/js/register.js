@@ -26,42 +26,42 @@ $("#register").click(function () {
 						break;
 					case "Username already taken":
 						$("#username").addClass("invalid");
-						$("[for=username]").attr("data-error", data["status"]);
+						$("#username_helper").attr("data-error", data["status"]);
 						break;
 					case "Password must have atleast 6 characters":
 						$("#password").addClass("invalid");
-						$("[for=password]").attr("data-error", data["status"]);
+						$("#password_helper").attr("data-error", data["status"]);
 						break;
 					case "Passwords do not match":
 						$("#confirm_password").addClass("invalid");
-						$("[for=confirm_password]").attr("data-error", data["status"]);
+						$("#confirm_password_helper").attr("data-error", data["status"]);
 						break;
 					case "This username is already in use":
 						$("#k_username").addClass("invalid");
-						$("[for=k_username]").attr("data-error", data["status"]);
+						$("#k_username_helper").attr("data-error", data["status"]);
 						break;
 					case "Username or password incorrect":
 						$("#k_password").addClass("invalid");
 						$("#k_username").addClass("invalid");
-						$("[for=k_username]").attr("data-error", data["status"]);
+						$("#k_username_helper").attr("data-error", data["status"]);
 						break;
 				}
 			} else {
 				if ($("#username").val() == "") {
 					$("#username").addClass("invalid");
-					$("[for=username]").attr("data-error", "Field empty");
+					$("#username_helper").attr("data-error", "Field empty");
 				}
 				if ($("#password").val() == "") {
 					$("#password").addClass("invalid");
-					$("[for=password]").attr("data-error", "Field empty");
+					$("#password_helper").attr("data-error", "Field empty");
 				}
 				if ($("#confirm_password").val() == "") {
 					$("#confirm_password").addClass("invalid");
-					$("[for=confirm_password]").attr("data-error", "Field empty");
+					$("#confirm_password_helper").attr("data-error", "Field empty");
 				}
 				if ($("#k_username").val() == "") {
 					$("#k_username").addClass("invalid");
-					$("[for=k_username]").attr("data-error", "Field empty");
+					$("#k_username_helper").attr("data-error", "Field empty");
 				}
 				if ($("#k_password").val() == "") {
 					$("#k_password").addClass("invalid");
