@@ -22,7 +22,8 @@
          <nav class="blue-grey z-depth-0">
             <div class="nav-wrapper">
                <a href="#" data-target="sidenav" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
-               <a href="/" class="brand-logo" style="font-weight: 100;"><i class="material-icons">restaurant</i>Auto Kroky</a>
+               <a href="/" class="brand-logo hide-on-small-only" style="font-weight: 100;"><i class="material-icons">restaurant</i>Auto Kroky</a>
+               <div class="brand-logo hide-on-med-and-up">Naročanje</div>
                <ul class="right hide-on-med-and-down">
                   <li><a id="username" class="black-text chip dropdown-trigger center" href="#" data-target="logout" style="min-width: 80px;">Username</a></li>
                </ul>
@@ -33,6 +34,8 @@
          <li><a href="logout" class="black-text"><i class="material-icons">exit_to_app</i>Odjava</a></li>
       </ul>
       <ul class="sidenav sidenav-fixed z-depth-0 grey lighten-4" id="sidenav">
+         <li><h4 class="center hide-on-med-and-up" style="font-weight: 100; padding: 15px 0 15px 0;">Auto Kroky</h4></li>
+         <li><div class="divider hide-on-med-and-up"></div></li>
          <li><a href="index"><i class="material-icons">fastfood</i>Pregled</a></li>
          <li><a href=""><i class="material-icons">tune</i>Naročanje</a></li>
          <li><a href="profile"><i class="material-icons">account_circle</i>Profil</a></li>
@@ -51,7 +54,7 @@
          </div>
          <div class="row">
             <div class="col offset-s0 s12 offset-m2 m8 offset-l3 l6">
-               <h3>Naročanje</h3>
+               <h3 class="hide-on-small-only">Naročanje</h3>
                <div class="preloader">
                   <div class="progress">
                      <div class="indeterminate"></div>
