@@ -8,6 +8,10 @@ $.get({
             hover: true,
             constrainWidth: false
          });
+		$('.dropdown-trigger-dots').dropdown({
+			coverTrigger: false,
+            constrainWidth: false
+         });
 	},
 	dataType: "json"
 });

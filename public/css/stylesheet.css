@@ -43,3 +43,12 @@ footer {
 .tabs .indicator {
 	background-color: #607d8b;
 }
+
+.page-title {
+	font-size: 24px;
+	margin-left: 72px;
+}
+
+#logout {
+	border-radius: 5px;
+}
