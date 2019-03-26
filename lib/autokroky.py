@@ -71,8 +71,7 @@ class Order():
 		results = db.get_config(user_id)
 
 		for user in results:
-			if user_id is None:
-				user_id = user["id"]
+			user_id = user["id"]
 
 			blacklist = Order.get_blacklist(user)
 			index = Order.get_index(user)
@@ -118,8 +117,10 @@ class Order():
 				k.send_email()
 				print("Email send!")
 
+			print("Done")
+
 		db.close()
-		print("Done")
+
 
 
 if __name__ == '__main__':

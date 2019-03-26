@@ -64,7 +64,7 @@ class Connector(object):
 
 	def get_config(self, user_id=None):
 		if user_id:
-			stmt = "SELECT xxl,email,k_username,k_password,blacklist,conf_index FROM users WHERE id=?"
+			stmt = "SELECT id, xxl,email,k_username,k_password,blacklist,conf_index FROM users WHERE id=?"
 			self._cursor.execute(stmt, [user_id])
 		else:
 			stmt = "SELECT id, xxl, email, k_username, k_password, blacklist, conf_index FROM users"
