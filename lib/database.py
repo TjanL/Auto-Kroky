@@ -10,7 +10,7 @@ class Connector(object):
 			self._create_users_table()
 			self._create_log_table()
 			self._create_log_timestamp_triggers()
-			self.close
+			self.close()
 
 	def connect(self):
 		self._conn = sqlite3.connect(self.file_path)

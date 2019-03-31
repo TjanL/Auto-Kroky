@@ -71,8 +71,6 @@ class Order():
 		results = db.get_config(user_id)
 
 		for user in results:
-			user_id = user["id"]
-
 			blacklist = Order.get_blacklist(user)
 			index = Order.get_index(user)
 
@@ -111,7 +109,7 @@ class Order():
 			log = json.dumps(log, ensure_ascii=False)#.encode('utf8')
 			monday = datetime.datetime.strptime(k.week, "%d.%m.%Y")
 			friday = monday.date() + datetime.timedelta(days=4)
-			db.set_log(user_id, monday.strftime("%Y-%m-%d"), friday.strftime("%Y-%m-%d"), log)
+			db.set_log(user["id"], monday.strftime("%Y-%m-%d"), friday.strftime("%Y-%m-%d"), log)
 
 			if user["email"]:
 				k.send_email()
