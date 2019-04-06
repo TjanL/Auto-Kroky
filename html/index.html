@@ -15,17 +15,17 @@
       <link rel="shortcut icon" type="image/ico" href="/public/assets/favicon.ico"/>
       <title>Auto Kroky</title>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
       <link href="/public/css/stylesheet.css" rel="stylesheet">
    </head>
    <body class="grey lighten-5">
       <div class="navbar-fixed">
          <nav class="blue-grey z-depth-0">
             <div class="nav-wrapper">
-               <a href="#" data-target="sidenav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+               <a href="#" data-target="sidenav" class="sidenav-trigger"><i class="material-icons-round">menu</i></a>
                <a href="/" class="brand-logo hide-on-small-only" style="font-weight: 100; padding-left: 16px;"><i class="material-icons">restaurant</i>Auto Kroky</a>
                <ul class="right ">
-                  <li><a id="username" class="black-text chip center dropdown-trigger hide-on-med-and-down" href="#" data-target="logout" style="min-width: 80px;">Username</a></li>
+                  <li><a class="username black-text chip center dropdown-trigger hide-on-med-and-down" href="#" data-target="logout" style="min-width: 80px;">Username</a></li>
                   <li><a class="dropdown-trigger-dots hide-on-med-and-up" href="#" data-target="logout"><i class="material-icons">more_vert</i></a></li>
                </ul>
                <div class="hide-on-med-and-up page-title">Naročilo</div>
@@ -36,12 +36,13 @@
          <li><a href="logout" class="black-text"><i class="material-icons">exit_to_app</i>Odjava</a></li>
       </ul>
       <ul class="sidenav sidenav-fixed z-depth-0 grey lighten-4" id="sidenav">
-         <li class="hide-on-med-and-up"><a href=""><h4>Auto Kroky</h4></a></li>
+         <li class="hide-on-med-and-up center"><a href=""><h4>Auto Kroky</h4></a></li>
+         <li class="hide-on-med-and-up center"><a class="username" href="#">Username</a></li>
          <li><div class="divider hide-on-med-and-up"></div></li>
-         <li><a href=""><i class="material-icons">fastfood</i>Pregled</a></li>
-         <li><a href="preferences"><i class="material-icons">tune</i>Naročanje</a></li>
-         <li><a href="profile"><i class="material-icons">account_circle</i>Profil</a></li>
-         <li><a href=""><i class="material-icons">bar_chart</i>Analitika</a></li>
+         <li><a href=""><i class="material-icons-outlined">fastfood</i>Pregled</a></li>
+         <li><a href="preferences"><i class="material-icons-outlined">tune</i>Naročanje</a></li>
+         <li><a href="profile"><i class="material-icons-outlined">account_circle</i>Profil</a></li>
+         <li><a href=""><i class="material-icons-outlined">bar_chart</i>Analitika</a></li>
          <li class="sidenav-footer">
             <a class="grey-text waves-effect" href="disclaimer">
                <div class="center"><label>© 2019 - Disclaimer</label></div>
