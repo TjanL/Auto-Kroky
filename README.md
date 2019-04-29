@@ -5,7 +5,6 @@
 # Auto Kroky
 Simple automatic snack ordering on [Kroky.si](http://www.kroky.si/)
 
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django.svg)](https://www.python.org/downloads/)
 ## Installation
 ```
 # apt install python3 python3-pip
